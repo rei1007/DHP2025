@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロトタイプ</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 { border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
 
+    <div class="container">
+        <h1>テストページ</h1>
+        <p>これは1つのファイルにまとめたテンプレートです。</p>
+        <button onclick="showMessage()">クリックしてね</button>
+        <div id="output" style="margin-top: 20px; color: red;"></div>
+    </div>
+
+    <script>
+        function showMessage() {
+            const output = document.getElementById('output');
+            output.textContent = 'JavaScriptも正常に動作しています！ (' + new Date().toLocaleTimeString() + ')';
+        }
+    </script>
+</body>
+</html>
