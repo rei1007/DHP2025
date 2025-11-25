@@ -1,22 +1,36 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GKJQRG9G0Q"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-GKJQRG9G0Q');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大学杯</title>
     <link rel="icon" href="icons/favicon.ico">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
 
     <style>
         /* --- テーマ定義 (Friendly Brutalism) --- */
         :root {
-            --color-main: #1F2937;  /* 濃いグレー */
-            --color-bg: #F3F4F6;    /* 背景グレー */
-            --color-panel: #FFFFFF; /* パネル白 */
-            --color-shadow: #D1D5DB; /* 影ライトグレー */
+            --color-main: #1F2937;
+            --color-bg: #F3F4F6;
+            --color-panel: #FFFFFF;
+            --color-shadow: #D1D5DB;
             --color-text-sub: #6B7280;
         }
 
@@ -46,6 +60,7 @@
             border-bottom: 2px solid var(--color-main);
             padding-bottom: 1.5rem;
         }
+
         .app-subtitle {
             font-size: 0.875rem;
             font-weight: 700;
@@ -54,8 +69,9 @@
             margin-bottom: 0.5rem;
             font-family: sans-serif;
         }
+
         .app-title {
-            font-size: 3rem; /* 大胆なサイズ */
+            font-size: 3rem;
             font-weight: 900;
             color: var(--color-main);
             line-height: 1.1;
@@ -70,23 +86,26 @@
             width: 100%;
             max-width: 1000px;
         }
+
         @media (min-width: 768px) {
-            .main-grid { grid-template-columns: 1fr 1fr; }
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
-        /* --- アクションカード (大胆な構成 + 優しい配色) --- */
+        /* --- アクションカード --- */
         .action-card {
             background-color: var(--color-panel);
             border: 2px solid var(--color-main);
-            border-radius: 1rem; /* 角丸 */
-            padding: 2.5rem;     /* 広い余白 */
-            min-height: 280px;   /* 高さ確保 */
+            border-radius: 1rem;
+            padding: 2.5rem;
+            min-height: 280px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 8px 8px 0 0 var(--color-shadow); /* ハードシャドウ */
+            box-shadow: 8px 8px 0 0 var(--color-shadow);
             text-decoration: none;
             color: var(--color-main);
             position: relative;
@@ -95,11 +114,10 @@
 
         .action-card:hover {
             transform: translate(-2px, -2px);
-            box-shadow: 12px 12px 0 0 var(--color-shadow); /* ホバーで影が伸びる */
+            box-shadow: 12px 12px 0 0 var(--color-shadow);
             background-color: #FFFFFF;
         }
-        
-        /* カード内のテキスト */
+
         .card-sub-label {
             font-size: 0.875rem;
             font-weight: 900;
@@ -110,7 +128,7 @@
         }
 
         .card-main-label {
-            font-size: 2.25rem; /* 大きな文字 */
+            font-size: 2.25rem;
             font-weight: 900;
             line-height: 1.2;
         }
@@ -149,6 +167,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <header class="header-area">
@@ -157,7 +176,7 @@
     </header>
 
     <main class="main-grid">
-        
+
         <a href="./viewer/bracket.html" class="action-card group">
             <div>
                 <p class="card-sub-label">TOURNAMENT BRACKET</p>
@@ -169,11 +188,12 @@
             </div>
         </a>
 
-        </main>
+    </main>
 
     <footer class="footer-area">
         © DAIGAKUHAI
     </footer>
 
 </body>
+
 </html>
