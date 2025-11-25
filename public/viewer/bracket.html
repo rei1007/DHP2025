@@ -12,10 +12,18 @@
     </script>
 
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>決勝トーナメント表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>決勝トーナメント - 大学杯</title>
     <link rel="icon" href="../icons/favicon.ico">
+
+    <meta name="description" content="現在開催している大会の決勝トーナメント表です。大学杯は、大学生による大学生のためのスプラトゥーンのコミュニティ大会です。">
+    <meta name="keywords" content="スプラ, スプラトゥーン, スプラ3, スプラトゥーン3, 大学杯, 大会, トーナメント表 ,e-sports">
+
+    <meta property="og:title" content="決勝トーナメント - 大学杯">
+    <meta property="og:description" content="現在開催している大会の決勝トーナメント表です。大学杯は、大学生による大学生のためのスプラトゥーンのコミュニティ大会です。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://daigakuhai.pages.dev/">
+    <meta name="twitter:card" content="summary">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,37 +56,23 @@
         }
 
         /* --- レイアウト基盤 --- */
-        html {
-            height: 100%;
-            overflow: hidden;
-        }
+        html { height: 100%; overflow: hidden; }
 
         body {
             font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
             background-color: var(--color-bg);
             color: var(--color-main);
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            overscroll-behavior: none;
-            display: flex;
-            justify-content: center;
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            overflow: hidden; overscroll-behavior: none;
+            display: flex; justify-content: center;
             background-image: radial-gradient(#E5E7EB 1px, transparent 1px);
             background-size: 24px 24px;
         }
 
-        .pt-safe {
-            padding-top: env(safe-area-inset-top, 0px);
-        }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
 
         #app-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: relative;
+            width: 100%; display: flex; flex-direction: column; height: 100%; position: relative;
         }
 
         .material-symbols-rounded {
@@ -87,739 +81,283 @@
         }
 
         /* --- ヘッダー --- */
-        header {
-            z-index: 50;
-            position: relative;
-            width: 100%;
-        }
+        header { z-index: 50; position: relative; width: 100%; }
 
         .header-inner {
-            width: 100%;
-            max-width: 1080px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            height: 4rem;
-            position: relative;
+            width: 100%; max-width: 1080px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 1rem; height: 4rem; position: relative;
         }
 
         .header-icon-btn {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--color-main);
-            background: #fff;
-            color: var(--color-main);
-            transition: all 0.2s;
-            border-radius: 0.5rem;
-            cursor: pointer;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--color-main); background: #fff; color: var(--color-main);
+            transition: all 0.2s; border-radius: 0.5rem; cursor: pointer;
             box-shadow: 2px 2px 0 0 var(--color-shadow);
         }
-
         .header-icon-btn:hover {
-            background: var(--color-main);
-            color: #fff;
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0 0 var(--color-shadow);
+            background: var(--color-main); color: #fff;
+            transform: translate(-1px, -1px); box-shadow: 3px 3px 0 0 var(--color-shadow);
         }
-
-        .header-icon-btn:hover svg {
-            fill: #fff;
-        }
-
-        .header-icon-btn:active {
-            transform: translate(0, 0);
-            box-shadow: none;
-        }
+        .header-icon-btn:hover svg { fill: #fff; }
+        .header-icon-btn:active { transform: translate(0, 0); box-shadow: none; }
 
         /* --- メインエリア --- */
         .main-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
+            flex: 1; position: relative; overflow: hidden; width: 100%; display: flex; flex-direction: column;
         }
 
         /* --- 大会名カード --- */
         .tournament-name-card {
             background-color: white;
-            border: 2px solid var(--color-main);
-            border-radius: 0.75rem;
-            box-shadow: 4px 4px 0 0 var(--color-shadow);
-            padding: 0.75rem 1.5rem;
-            margin: 1rem auto 0 auto;
-            text-align: center;
-            max-width: 90%;
-            width: fit-content;
-            z-index: 10;
-            flex-shrink: 0;
-            transition: opacity 0.3s;
+            border: 2px solid var(--color-main); border-radius: 0.75rem;
+            box-shadow: 4px 4px 0 0 var(--color-shadow); padding: 0.75rem 1.5rem;
+            margin: 1rem auto 0 auto; text-align: center; max-width: 90%;
+            width: fit-content; z-index: 10; flex-shrink: 0; transition: opacity 0.3s;
         }
-
         .tournament-label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: #9CA3AF;
-            letter-spacing: 0.1em;
-            margin-bottom: 0.1rem;
+            display: block; font-size: 0.7rem; font-weight: 800; color: #9CA3AF;
+            letter-spacing: 0.1em; margin-bottom: 0.1rem;
         }
-
         .tournament-name-text {
-            font-size: 1.25rem;
-            font-weight: 900;
-            color: var(--color-main);
-            line-height: 1.2;
+            font-size: 1.25rem; font-weight: 900; color: var(--color-main); line-height: 1.2;
         }
 
         /* --- トーナメント表エリア --- */
         .bracket-container {
-            flex: 1;
-            width: 100%;
-            overflow: auto;
-            padding: 2rem;
-            cursor: grab;
-            user-select: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            flex: 1; width: 100%; overflow: auto; padding: 2rem;
+            cursor: grab; user-select: none; display: flex; justify-content: center; align-items: center;
         }
-
+        
         .bracket-wrapper {
-            display: flex;
-            gap: 4rem;
-            margin: auto;
-            flex-shrink: 0;
+            display: flex; gap: 4rem; margin: auto; flex-shrink: 0;
         }
 
         .round-column {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            gap: 1.5rem;
-            width: 320px;
-            flex-shrink: 0;
+            display: flex; flex-direction: column; justify-content: space-around;
+            gap: 1.5rem; width: 320px; flex-shrink: 0;
         }
 
         .round-header {
-            text-align: center;
-            margin-bottom: 0.5rem;
-            font-weight: 900;
-            color: var(--color-main);
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid var(--color-main);
-            box-shadow: 2px 2px 0 0 var(--color-shadow);
-            padding: 0.4rem;
-            border-radius: 0.5rem;
+            text-align: center; margin-bottom: 0.5rem; font-weight: 900;
+            color: var(--color-main); font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9); border: 2px solid var(--color-main);
+            box-shadow: 2px 2px 0 0 var(--color-shadow); padding: 0.4rem; border-radius: 0.5rem;
         }
 
         /* --- マッチカード --- */
         .match-card {
-            background-color: #FFFFFF;
-            border: 2px solid var(--color-main);
-            border-radius: 0.75rem;
-            box-shadow: 4px 4px 0 0 var(--color-shadow);
-            padding: 0.75rem 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            position: relative;
-            transition: transform 0.2s;
-            margin: 0.5rem 0;
+            background-color: #FFFFFF; border: 2px solid var(--color-main);
+            border-radius: 0.75rem; box-shadow: 4px 4px 0 0 var(--color-shadow);
+            padding: 0.75rem 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;
+            position: relative; transition: transform 0.2s; margin: 0.5rem 0;
         }
-
-        .match-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 6px 6px 0 0 var(--color-shadow);
-            z-index: 10;
-        }
+        .match-card:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 0 var(--color-shadow); z-index: 10; }
 
         .match-card.is-live-active {
-            border-color: var(--color-live-bg);
-            box-shadow: 4px 4px 0 0 rgba(239, 68, 68, 0.3);
-            animation: pulse-border 2s infinite;
+            border-color: var(--color-live-bg); box-shadow: 4px 4px 0 0 rgba(239, 68, 68, 0.3); animation: pulse-border 2s infinite;
         }
-
         .match-card.is-live-inactive {
-            border-color: var(--color-live-inactive);
-            box-shadow: 4px 4px 0 0 rgba(107, 114, 128, 0.3);
+            border-color: var(--color-live-inactive); box-shadow: 4px 4px 0 0 rgba(107, 114, 128, 0.3);
         }
 
         @keyframes pulse-border {
-            0% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
         .match-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-            padding: 0 4px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 4px; padding: 0 4px;
         }
-
-        .header-badges {
-            display: flex;
-            gap: 4px;
-        }
-
+        .header-badges { display: flex; gap: 4px; }
         .match-id {
-            background: var(--color-main);
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
+            background: var(--color-main); color: white; font-size: 0.6rem;
+            padding: 2px 6px; border-radius: 4px; font-weight: bold;
         }
-
         .bo-badge {
-            background: #E5E7EB;
-            color: #4B5563;
-            font-size: 0.6rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            border: 1px solid #D1D5DB;
+            background: #E5E7EB; color: #4B5563; font-size: 0.6rem;
+            padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid #D1D5DB;
         }
-
+        
         .live-badge {
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 0.6rem;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            padding: 2px 8px; border-radius: 9999px; font-size: 0.6rem; font-weight: 900;
+            display: flex; align-items: center; gap: 4px;
         }
-
-        .live-badge.active {
-            background-color: var(--color-live-bg);
-            color: white;
-        }
-
-        .live-badge.inactive {
-            background-color: var(--color-live-inactive);
-            color: white;
-            opacity: 0.8;
-        }
+        .live-badge.active { background-color: var(--color-live-bg); color: white; }
+        .live-badge.inactive { background-color: var(--color-live-inactive); color: white; opacity: 0.8; }
 
         .team-row {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem;
-            border-radius: 0.375rem;
-            background-color: #F9FAFB;
-            transition: background-color 0.2s;
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem;
+            border-radius: 0.375rem; background-color: #F9FAFB; transition: background-color 0.2s;
         }
-
-        .team-row.winner {
-            background-color: #FEF3C7;
-            font-weight: bold;
-        }
-
-        .team-row.loser {
-            opacity: 0.6;
-        }
-
-        .team-label {
-            width: 4px;
-            height: 24px;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
-
-        .label-alpha {
-            background-color: var(--color-alpha);
-        }
-
-        .label-bravo {
-            background-color: var(--color-bravo);
-        }
+        .team-row.winner { background-color: #FEF3C7; font-weight: bold; }
+        .team-row.loser { opacity: 0.6; }
+        
+        .team-label { width: 4px; height: 24px; border-radius: 2px; flex-shrink: 0; }
+        .label-alpha { background-color: var(--color-alpha); }
+        .label-bravo { background-color: var(--color-bravo); }
 
         .team-name-display {
-            flex: 1;
-            font-size: 0.9rem;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            padding: 2px 4px;
-            border-radius: 4px;
+            flex: 1; font-size: 0.9rem; font-weight: 700; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+            padding: 2px 4px; border-radius: 4px;
         }
+        .team-name-display:hover { color: var(--color-main); background-color: #E5E7EB; text-decoration: underline; }
+        .team-name-display.withdrawn { text-decoration: line-through; color: #9CA3AF; pointer-events: none; }
+        .team-name-display.undecided { color: #9CA3AF; cursor: default; pointer-events: none; }
+        .team-name-display.undecided:hover { background-color: transparent; text-decoration: none; }
 
-        .team-name-display:hover {
-            color: var(--color-main);
-            background-color: #E5E7EB;
-            text-decoration: underline;
-        }
-
-        .team-name-display.withdrawn {
-            text-decoration: line-through;
-            color: #9CA3AF;
-            pointer-events: none;
-        }
-
-        .team-name-display.undecided {
-            color: #9CA3AF;
-            cursor: default;
-            pointer-events: none;
-        }
-
-        .team-name-display.undecided:hover {
-            background-color: transparent;
-            text-decoration: none;
-        }
-
-        .score-display {
-            width: 24px;
-            text-align: center;
-            font-weight: 900;
-            font-size: 1.1rem;
-        }
-
-        .win-icon {
-            width: 24px;
-            text-align: center;
-            color: #F59E0B;
-        }
-
+        .score-display { width: 24px; text-align: center; font-weight: 900; font-size: 1.1rem; }
+        .win-icon { width: 24px; text-align: center; color: #F59E0B; }
         .match-card::after {
-            content: '→';
-            position: absolute;
-            right: -36px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #D1D5DB;
-            font-weight: 900;
-            font-size: 1.5rem;
-            display: none;
+            content: '→'; position: absolute; right: -36px; top: 50%; transform: translateY(-50%);
+            color: #D1D5DB; font-weight: 900; font-size: 1.5rem; display: none;
         }
+        .round-column:not(:last-child) .match-card::after { display: block; }
 
-        .round-column:not(:last-child) .match-card::after {
-            display: block;
-        }
-
-        /* --- 予選中メッセージ --- */
+        /* --- メッセージ表示エリア (予選中・期間外共通) --- */
         .qualifying-message-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-            color: #6B7280;
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 2rem; color: #6B7280;
         }
-
-        .qualifying-icon {
-            font-size: 64px;
-            margin-bottom: 1rem;
-            color: #9CA3AF;
-        }
-
-        .qualifying-title {
-            font-size: 2rem;
-            font-weight: 900;
-            margin-bottom: 0.5rem;
-            color: var(--color-main);
-        }
-
-        .qualifying-sub {
-            font-size: 1rem;
-            font-weight: 700;
-        }
+        .qualifying-icon { font-size: 64px; margin-bottom: 1rem; color: #9CA3AF; }
+        .qualifying-title { font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem; color: var(--color-main); }
+        .qualifying-sub { font-size: 1rem; font-weight: 700; line-height: 1.5; }
 
         /* --- Modal Common --- */
         .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(31, 41, 55, 0.6);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
+            position: fixed; inset: 0; background-color: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;
+            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
         }
-
-        .modal-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        
         .modal-content-base {
-            background: #FFFFFF;
-            width: 95%;
-            max-width: 600px;
-            max-height: 90vh;
-            border: 2px solid var(--color-main);
-            border-radius: 1rem;
+            background: #FFFFFF; width: 95%; max-width: 600px; max-height: 90vh;
+            border: 2px solid var(--color-main); border-radius: 1rem;
             box-shadow: 6px 6px 0 0 var(--color-shadow);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transform: scale(0.95);
-            transition: transform 0.2s;
+            display: flex; flex-direction: column; overflow: hidden;
+            transform: scale(0.95); transition: transform 0.2s;
         }
-
-        .modal-overlay.show .modal-content-base {
-            transform: scale(1);
-        }
+        .modal-overlay.show .modal-content-base { transform: scale(1); }
 
         .team-card-header-bar {
-            height: 12px;
-            width: 100%;
-            border-bottom: 2px solid var(--color-main);
-            flex-shrink: 0;
+            height: 12px; width: 100%; border-bottom: 2px solid var(--color-main); flex-shrink: 0;
             background-color: var(--color-main);
         }
-
-        .team-card-body {
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
+        .team-card-body { padding: 2rem; display: flex; flex-direction: column; overflow-y: auto; }
 
         /* --- Team Info Styles --- */
-        .header-section {
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #E5E7EB;
-            padding-bottom: 1.5rem;
-        }
-
+        .header-section { margin-bottom: 1.5rem; border-bottom: 2px solid #E5E7EB; padding-bottom: 1.5rem; }
         .univ-name {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #4B5563;
-            line-height: 1.2;
-            margin-bottom: 0.25rem;
-            letter-spacing: 0.05em;
+            font-size: 1.8rem; font-weight: 800; color: #4B5563; line-height: 1.2;
+            margin-bottom: 0.25rem; letter-spacing: 0.05em;
         }
-
-        .team-kana {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #6B7280;
-            margin-bottom: 0;
-            line-height: 1.2;
-        }
-
+        .team-kana { font-size: 1.1rem; font-weight: 700; color: #6B7280; margin-bottom: 0; line-height: 1.2; }
         .team-name-lg {
-            font-size: 2.5rem;
-            font-weight: 900;
-            line-height: 1.1;
-            color: var(--color-main);
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-            margin-top: 0.25rem;
+            font-size: 2.5rem; font-weight: 900; line-height: 1.1; color: var(--color-main);
+            margin-bottom: 1rem; letter-spacing: -0.02em; margin-top: 0.25rem;
         }
 
         .circle-tag {
-            display: inline-flex;
-            align-items: center;
-            background-color: #F9FAFB;
-            border: 2px solid var(--color-main);
-            border-radius: 0.75rem;
-            padding: 0.4rem 1rem 0.4rem 0.5rem;
-            cursor: pointer;
-            box-shadow: 2px 2px 0 0 var(--color-shadow);
-            transition: transform 0.1s;
+            display: inline-flex; align-items: center; background-color: #F9FAFB;
+            border: 2px solid var(--color-main); border-radius: 0.75rem;
+            padding: 0.4rem 1rem 0.4rem 0.5rem; cursor: pointer;
+            box-shadow: 2px 2px 0 0 var(--color-shadow); transition: transform 0.1s;
         }
-
-        .circle-tag:hover {
-            transform: translateY(-1px);
-            box-shadow: 3px 3px 0 0 var(--color-shadow);
-        }
-
-        .circle-icon {
-            font-size: 24px;
-            margin-right: 0.5rem;
-            color: #6B7280;
-        }
-
-        .circle-text {
-            font-weight: 700;
-            font-size: 1.125rem;
-            color: #374151;
-        }
+        .circle-tag:hover { transform: translateY(-1px); box-shadow: 3px 3px 0 0 var(--color-shadow); }
+        .circle-icon { font-size: 24px; margin-right: 0.5rem; color: #6B7280; }
+        .circle-text { font-weight: 700; font-size: 1.125rem; color: #374151; }
 
         .avg-xp-box {
-            display: inline-block;
-            background-color: white;
-            color: var(--color-main);
-            font-weight: 800;
-            font-size: 1rem;
-            padding: 0.25rem 1rem;
-            border-radius: 9999px;
-            box-shadow: 2px 2px 0 0 var(--color-shadow);
-            margin-top: 0.5rem;
-            border: 2px solid var(--color-main);
-            margin-left: 0.5rem;
+            display: inline-block; background-color: white; color: var(--color-main);
+            font-weight: 800; font-size: 1rem; padding: 0.25rem 1rem; border-radius: 9999px;
+            box-shadow: 2px 2px 0 0 var(--color-shadow); margin-top: 0.5rem;
+            border: 2px solid var(--color-main); margin-left: 0.5rem;
         }
 
-        .member-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
+        .member-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1rem; }
         .member-card {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            background-color: white;
-            border: 2px solid #E5E7EB;
-            border-radius: 0.75rem;
+            display: flex; align-items: center; padding: 0.75rem 1rem;
+            background-color: white; border: 2px solid #E5E7EB; border-radius: 0.75rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-
-        .name-group {
-            flex: 1;
-            display: flex;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .member-name {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: var(--color-main);
-            line-height: 1;
-        }
-
-        .member-kana {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #9CA3AF;
-        }
-
+        .name-group { flex: 1; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+        .member-name { font-size: 1.25rem; font-weight: 800; color: var(--color-main); line-height: 1; }
+        .member-kana { font-size: 0.75rem; font-weight: 600; color: #9CA3AF; }
         .member-weapon {
-            display: block;
-            width: 100%;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #6B7280;
-            margin-top: 0.25rem;
+            display: block; width: 100%; font-size: 0.85rem; font-weight: 600; color: #6B7280; margin-top: 0.25rem;
         }
 
-        .info-separator {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .info-separator-line {
-            flex: 1;
-            height: 2px;
-            background-color: #E5E7EB;
-        }
-
+        .info-separator { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .info-separator-line { flex: 1; height: 2px; background-color: #E5E7EB; }
         .info-separator-text {
-            font-weight: 800;
-            font-size: 1rem;
-            color: #9CA3AF;
-            background-color: #F3F4F6;
-            padding: 0.25rem 1rem;
-            border-radius: 9999px;
-            letter-spacing: 0.1em;
+            font-weight: 800; font-size: 1rem; color: #9CA3AF; background-color: #F3F4F6;
+            padding: 0.25rem 1rem; border-radius: 9999px; letter-spacing: 0.1em;
         }
 
         .info-block {
-            background-color: white;
-            border: 2px solid #E5E7EB;
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            position: relative;
+            background-color: white; border: 2px solid #E5E7EB; border-radius: 0.75rem;
+            padding: 1.25rem; margin-bottom: 1rem; position: relative;
         }
-
         .info-label {
-            position: absolute;
-            top: -12px;
-            left: 1rem;
-            background-color: #F3F4F6;
-            color: #4B5563;
-            font-weight: 700;
-            font-size: 0.8rem;
-            padding: 0.1rem 0.75rem;
-            border-radius: 0.5rem;
-            border: 2px solid #E5E7EB;
+            position: absolute; top: -12px; left: 1rem; background-color: #F3F4F6;
+            color: #4B5563; font-weight: 700; font-size: 0.8rem; padding: 0.1rem 0.75rem;
+            border-radius: 0.5rem; border: 2px solid #E5E7EB;
         }
-
-        .info-content {
-            font-weight: 500;
-            font-size: 1rem;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            color: #4B5563;
-        }
+        .info-content { font-weight: 500; font-size: 1rem; line-height: 1.7; white-space: pre-wrap; color: #4B5563; }
 
         .close-btn-area {
-            padding: 1rem;
-            background: #F9FAFB;
-            border-top: 1px solid #E5E7EB;
-            display: flex;
-            justify-content: center;
-            flex-shrink: 0;
+            padding: 1rem; background: #F9FAFB; border-top: 1px solid #E5E7EB;
+            display: flex; justify-content: center; flex-shrink: 0;
         }
-
         .modal-close-btn {
-            background: var(--color-main);
-            color: white;
-            font-weight: 800;
-            padding: 0.5rem 2rem;
-            border-radius: 9999px;
-            box-shadow: 2px 2px 0 0 #9CA3AF;
-            transition: all 0.1s;
+            background: var(--color-main); color: white; font-weight: 800; padding: 0.5rem 2rem;
+            border-radius: 9999px; box-shadow: 2px 2px 0 0 #9CA3AF; transition: all 0.1s;
         }
-
-        .modal-close-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 3px 3px 0 0 #9CA3AF;
-        }
-
-        .modal-close-btn:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
+        .modal-close-btn:hover { transform: translateY(-1px); box-shadow: 3px 3px 0 0 #9CA3AF; }
+        .modal-close-btn:active { transform: translateY(0); box-shadow: none; }
 
         /* --- Circle Modal Styles --- */
         .circle-modal-content {
-            background: white;
-            width: 90%;
-            max-width: 600px;
-            border: 2px solid var(--color-main);
-            border-radius: 1rem;
+            background: white; width: 90%; max-width: 600px;
+            border: 2px solid var(--color-main); border-radius: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            overflow: hidden; display: flex; flex-direction: column;
         }
-
         .circle-modal-header {
-            padding: 1rem;
-            border-bottom: 1px solid #E5E7EB;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #F9FAFB;
+            padding: 1rem; border-bottom: 1px solid #E5E7EB; display: flex;
+            justify-content: space-between; align-items: center; background-color: #F9FAFB;
         }
-
-        .circle-modal-title {
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: #374151;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .circle-modal-body {
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
+        .circle-modal-title { font-weight: 700; font-size: 1.25rem; color: #374151; display: flex; align-items: center; gap: 0.5rem; }
+        .circle-modal-body { padding: 2rem; overflow-y: auto; }
         .circle-img-container {
-            width: 8rem;
-            height: 8rem;
-            border-radius: 9999px;
-            overflow: hidden;
-            border: 2px solid #E5E7EB;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1rem;
-            background-color: #F3F4F6;
-            margin-left: auto;
-            margin-right: auto;
+            width: 8rem; height: 8rem; border-radius: 9999px; overflow: hidden;
+            border: 2px solid #E5E7EB; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem; background-color: #F3F4F6; margin-left: auto; margin-right: auto;
         }
-
         .circle-univ-sub {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #6B7280;
-            margin-bottom: 0.25rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            text-align: center;
+            font-size: 1rem; font-weight: 700; color: #6B7280; margin-bottom: 0.25rem;
+            text-transform: uppercase; letter-spacing: 0.1em; text-align: center;
         }
-
-        .circle-name-lg {
-            font-size: 1.875rem;
-            font-weight: 900;
-            color: #1F2937;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .sns-tags {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
+        .circle-name-lg { font-size: 1.875rem; font-weight: 900; color: #1F2937; margin-bottom: 1.5rem; text-align: center; }
+        
+        .sns-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
         .sns-tag-item {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            background-color: white;
-            border: 1px solid #D1D5DB;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            font-weight: 700;
-            color: #4B5563;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            text-decoration: none;
-            transition: all 0.2s;
-            cursor: pointer;
+            display: inline-flex; align-items: center; padding: 0.25rem 0.75rem;
+            background-color: white; border: 1px solid #D1D5DB; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-weight: 700; color: #4B5563; border-radius: 0.5rem; font-size: 0.875rem;
+            text-decoration: none; transition: all 0.2s; cursor: pointer;
         }
-
         .sns-tag-item:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border-color: var(--color-main);
-            color: var(--color-main);
+            transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-color: var(--color-main); color: var(--color-main);
         }
-
-        .circle-desc-box {
-            background-color: #F9FAFB;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            border: 1px solid #E5E7EB;
-        }
-
-        .circle-desc-text {
-            color: #374151;
-            line-height: 1.625;
-            white-space: pre-wrap;
-            font-weight: 500;
-        }
+        .circle-desc-box { background-color: #F9FAFB; border-radius: 0.5rem; padding: 1.5rem; border: 1px solid #E5E7EB; }
+        .circle-desc-text { color: #374151; line-height: 1.625; white-space: pre-wrap; font-weight: 500; }
     </style>
 </head>
 
@@ -858,7 +396,7 @@
         </header>
 
         <main class="main-container">
-            <div id="tournament-name-card" class="tournament-name-card opacity-0">
+            <div id="tournament-name-card" class="tournament-name-card opacity-0 hidden">
                 <span class="tournament-label">CURRENT TOURNAMENT</span>
                 <h2 id="tournament-name-display" class="tournament-name-text"></h2>
             </div>
@@ -962,7 +500,9 @@
         let currentFormat = 8;
         let tournamentData = { matches: {}, roundNames: {} };
         let tournamentSettings = {
-            matchFormat: { other: 'BO3', semis: 'BO5', finals: 'BO5' }
+            matchFormat: { other: 'BO3', semis: 'BO5', finals: 'BO5' },
+            startDate: null,
+            startTime: null
         };
 
         const SEED_ID = "THE_SEED";
@@ -1024,7 +564,7 @@
                     const data = docSnap.data();
                     tournamentSettings = { ...tournamentSettings, ...data };
 
-                    // Update Tournament Name Card
+                    // Update Tournament Name Card (Text Only)
                     if (data.tournamentName) {
                         nameDisplayEl.textContent = data.tournamentName;
                         nameCardEl.classList.remove('opacity-0');
@@ -1047,6 +587,22 @@
             });
         }
 
+        // --- Check if tournament is currently active based on Date/Time ---
+        function checkTournamentActive() {
+            // #debug hash skips time check
+            if (window.location.hash === '#debug') return true;
+
+            const { startDate, startTime } = tournamentSettings;
+            
+            if (!startDate || !startTime) return true; 
+
+            const start = new Date(`${startDate}T${startTime}`);
+            const end = new Date(start.getTime() + 12 * 60 * 60 * 1000); // +12 hours
+            const now = new Date();
+
+            return now >= start && now <= end;
+        }
+
         function checkQualifyingStatus() {
             if (!currentFormat || !tournamentData.matches) return true;
             const matchCountR1 = currentFormat / 2;
@@ -1063,6 +619,14 @@
         }
 
         function render() {
+            // 1. Check Time Validity
+            const isActiveTime = checkTournamentActive();
+            if (!isActiveTime) {
+                renderOfflineScreen();
+                return;
+            }
+
+            // 2. Check Qualifying Status
             if (checkQualifyingStatus()) {
                 renderQualifyingScreen();
             } else {
@@ -1070,7 +634,23 @@
             }
         }
 
+        function renderOfflineScreen() {
+            // 大会期間外：カード自体を非表示に
+            nameCardEl.classList.add('hidden');
+
+            bracketWrapper.innerHTML = `
+                <div class="qualifying-message-container">
+                    <span class="material-symbols-rounded qualifying-icon">event_busy</span>
+                    <h2 class="qualifying-title">現在大会は行われていません</h2>
+                    <p class="qualifying-sub">開催日時をご確認ください。<br>（大会開始〜12時間後まで表示されます）</p>
+                </div>
+            `;
+        }
+
         function renderQualifyingScreen() {
+            // 期間内：カードを表示
+            nameCardEl.classList.remove('hidden');
+
             bracketWrapper.innerHTML = `
                 <div class="qualifying-message-container">
                     <span class="material-symbols-rounded qualifying-icon">sports_esports</span>
@@ -1100,6 +680,9 @@
         }
 
         function renderBracket() {
+            // 期間内：カードを表示
+            nameCardEl.classList.remove('hidden');
+
             bracketWrapper.innerHTML = '';
             const totalRounds = Math.log2(currentFormat);
 
