@@ -126,10 +126,13 @@
         /* --- トーナメント表エリア --- */
         .bracket-container {
             flex: 1; width: 100%; overflow: auto; padding: 2rem;
-            cursor: grab; user-select: none; display: flex; justify-content: center; align-items: center;
+            cursor: grab; user-select: none; 
+            /* 修正箇所: justify-content: center と align-items: center を削除 */
+            display: flex; 
         }
         
         .bracket-wrapper {
+            /* margin: auto により、コンテンツが小さい時は中央、大きい時は左上から配置されます */
             display: flex; gap: 4rem; margin: auto; flex-shrink: 0;
         }
 
