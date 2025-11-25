@@ -20,7 +20,7 @@
     <style>
         /* --- テーマ定義 --- */
         :root {
-            --color-main: #374151;
+            --color-main: #1F2937;
             --color-bg: #F3F4F6;
             --color-panel: #FFFFFF;
             --color-shadow: #D1D5DB;
@@ -89,12 +89,39 @@
         /* --- メインエリア --- */
         .main-container {
             flex: 1; position: relative; overflow: hidden; width: 100%;
+            display: flex; flex-direction: column;
+        }
+
+        /* --- 大会名カード --- */
+        .tournament-name-card {
+            background-color: white;
+            border: 2px solid var(--color-main);
+            border-radius: 0.75rem;
+            box-shadow: 4px 4px 0 0 var(--color-shadow);
+            padding: 0.75rem 1.5rem;
+            margin: 1rem auto 0 auto; /* 上部にマージン、中央寄せ */
+            text-align: center;
+            max-width: 90%;
+            width: fit-content;
+            z-index: 10;
+            flex-shrink: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tournament-label {
+            display: block; font-size: 0.7rem; font-weight: 800; color: #9CA3AF;
+            letter-spacing: 0.1em; margin-bottom: 0.1rem;
+        }
+        
+        .tournament-name-text {
+            font-size: 1.25rem; font-weight: 900; color: var(--color-main);
+            line-height: 1.2;
         }
 
         /* --- トーナメント表エリア --- */
         .bracket-container {
-            width: 100%; height: 100%; overflow: auto;
-            padding: 4rem 2rem; cursor: grab; user-select: none;
+            flex: 1; width: 100%; overflow: auto;
+            padding: 2rem; cursor: grab; user-select: none;
             display: flex; justify-content: center; align-items: center; 
         }
         
@@ -123,13 +150,11 @@
         }
         .match-card:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 0 var(--color-shadow); z-index: 10; }
 
-        /* 赤色ON AIR (Active) */
         .match-card.is-live-active {
             border-color: var(--color-live-bg);
             box-shadow: 4px 4px 0 0 rgba(239, 68, 68, 0.3);
             animation: pulse-border 2s infinite;
         }
-        /* 灰色ON AIR (Inactive) */
         .match-card.is-live-inactive {
             border-color: var(--color-live-inactive);
             box-shadow: 4px 4px 0 0 rgba(107, 114, 128, 0.3);
@@ -212,7 +237,6 @@
         }
         .modal-overlay.show { opacity: 1; pointer-events: auto; }
         
-        /* チーム詳細モーダル用 (team-card style) */
         .modal-content-base {
             background: #FFFFFF; width: 95%; max-width: 600px; max-height: 90vh;
             border: 2px solid var(--color-main); border-radius: 1rem;
@@ -357,6 +381,15 @@
     <div id="app-container">
         <header class="flex-shrink-0 bg-white border-b-2 border-gray-900 pt-safe z-50">
             <div class="header-inner">
+                <a href="../index.html" class="header-icon-btn" title="ホームに戻る">
+                    <span class="material-symbols-rounded">home</span>
+                </a>
+
+                <h1 class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                        text-lg md:text-xl font-black text-gray-900 tracking-tight whitespace-nowrap text-center">
+                    決勝トーナメント
+                </h1>
+
                 <div class="flex gap-2">
                     <a href="https://x.com/daigakuhai" target="_blank" rel="noopener noreferrer" class="header-icon-btn" title="X (@daigakuhai)">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="#1F2937">
@@ -369,17 +402,15 @@
                         </svg>
                     </a>
                 </div>
-
-                <h1 id="tournament-title"
-                    class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                            text-lg md:text-xl font-black text-gray-900 tracking-tight whitespace-nowrap text-center w-3/5 overflow-hidden text-ellipsis">
-                    大会名読み込み中...
-                </h1>
-                <div class="w-[88px]"></div>
             </div>
         </header>
 
         <main class="main-container">
+            <div id="tournament-name-card" class="tournament-name-card opacity-0">
+                <span class="tournament-label">CURRENT TOURNAMENT</span>
+                <h2 id="tournament-name-display" class="tournament-name-text"></h2>
+            </div>
+
             <div class="bracket-container">
                 <div id="bracket-wrapper" class="bracket-wrapper">
                     <div class="flex items-center justify-center w-full h-32 text-gray-400 font-bold">
@@ -483,7 +514,8 @@
 
         const SEED_ID = "THE_SEED";
         const bracketWrapper = document.getElementById('bracket-wrapper');
-        const titleEl = document.getElementById('tournament-title');
+        const nameDisplayEl = document.getElementById('tournament-name-display');
+        const nameCardEl = document.getElementById('tournament-name-card');
 
         // Team Modal Elements
         const modalEl = document.getElementById('team-modal');
@@ -538,11 +570,15 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     tournamentSettings = { ...tournamentSettings, ...data };
+                    
+                    // Update Tournament Name Card
                     if (data.tournamentName) {
-                        titleEl.textContent = `${data.tournamentName} 決勝トーナメント`;
+                        nameDisplayEl.textContent = data.tournamentName;
+                        nameCardEl.classList.remove('opacity-0');
                     } else {
-                        titleEl.textContent = "決勝トーナメント";
+                        nameCardEl.classList.add('opacity-0');
                     }
+
                     if(tournamentData.matches) render();
                 }
             });
@@ -665,11 +701,9 @@
             `;
             header.appendChild(badges);
 
-            // ON AIR Badge
             if (isAnyLive) {
                 const liveBadge = document.createElement('div');
                 const badgeClass = isActiveLive ? 'live-badge active' : 'live-badge inactive';
-                // テキストは常にON AIR
                 liveBadge.className = badgeClass;
                 liveBadge.innerHTML = `<span class="material-symbols-rounded" style="font-size: 14px;">sensors</span>ON AIR`;
                 header.appendChild(liveBadge);
@@ -747,13 +781,12 @@
             });
         }
 
-        // --- Team Modal Logic (Design Matched to team-viewer.html) ---
+        // --- Team Modal Logic ---
         window.openTeamModal = (teamId) => {
             const team = teamsMap.get(teamId);
             if (!team || teamId === SEED_ID) return;
             const isValid = (txt) => txt && txt !== "----" && txt !== "";
 
-            // Header (Color is always main grey as per team-viewer design concept)
             mEl.bar.style.backgroundColor = 'var(--color-main)';
             mEl.univ.textContent = team.university;
             mEl.kana.textContent = isValid(team.teamName_kana) ? team.teamName_kana : "";
@@ -769,7 +802,6 @@
                 mEl.xpTag.classList.add('hidden');
             }
 
-            // Members
             mEl.members.innerHTML = '';
             for (let i = 1; i <= 4; i++) {
                 const pName = team[`p${i}_name`];
@@ -789,7 +821,6 @@
                 mEl.members.appendChild(div);
             }
 
-            // Info Sections
             let infoHtml = '';
             const appendInfo = (label, text) => {
                 infoHtml += `<div class="info-block"><div class="info-label">${label}</div><p class="info-content">${text}</p></div>`;
@@ -807,7 +838,7 @@
         window.handleModalOutsideClick = (e) => { if (e.target === modalEl) closeTeamModal(); };
 
 
-        // --- Circle Modal Logic (Matched to team-viewer.html) ---
+        // --- Circle Modal Logic ---
         window.openCircleModal = (circleName) => {
             const info = circleData.find(c => c['circleName'] === circleName) || circleData.find(c => c['circle_name'] === circleName);
             if (!info) return;
@@ -841,7 +872,6 @@
         };
 
         window.closeCircleModal = () => cModalEl.classList.remove('show');
-        // サークルモーダルは外側クリックで閉じる実装も追加
         window.addEventListener('click', (e) => {
             if (e.target === cModalEl) closeCircleModal();
         });
