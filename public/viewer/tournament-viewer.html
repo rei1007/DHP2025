@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>トーナメント表</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>決勝トーナメント表</title>
     <link rel="icon" href="../icons/favicon.ico">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,391 +20,436 @@
     <style>
         /* --- テーマ定義 --- */
         :root {
-            --color-main: #1F2937;
+            --color-main: #374151;
             --color-bg: #F3F4F6;
             --color-panel: #FFFFFF;
             --color-shadow: #D1D5DB;
             
-            --color-live-bg: #EF4444;
-            --color-live-inactive: #9CA3AF;
-            --color-live-text: #FFFFFF;
-            
             /* Match Colors */
             --color-alpha: #d0be08;
             --color-bravo: #3a0ccd;
-            --color-win-bg: #FEF3C7;
+            --color-live-bg: #EF4444;
+            --color-live-text: #FFFFFF;
+            --color-live-inactive: #6B7280;
+
+            /* Modal & Team Card Colors */
+            --color-alpha-light: #FEFCE8;
+            --color-bravo-light: #EFF6FF;
         }
+
+        /* --- レイアウト基盤 --- */
+        html { height: 100%; overflow: hidden; }
 
         body {
             font-family: 'Zen Kaku Gothic New', 'Kosugi Maru', sans-serif;
             background-color: var(--color-bg);
             color: var(--color-main);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            position: fixed; inset: 0; width: 100%; height: 100%;
+            overflow: hidden; overscroll-behavior: none;
+            display: flex; justify-content: center;
+            background-image: radial-gradient(#E5E7EB 1px, transparent 1px);
+            background-size: 24px 24px;
         }
 
-        /* --- ヘッダー --- */
-        .viewer-header {
-            background-color: #FFFFFF;
-            border-bottom: 3px solid var(--color-main);
-            padding: 1rem; /* 高さを抑える */
-            text-align: center;
-            z-index: 50;
-            flex-shrink: 0;
-        }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
 
-        .tournament-title {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--color-main);
-            line-height: 1;
-            letter-spacing: -0.02em;
-        }
-        @media (min-width: 768px) { .tournament-title { font-size: 2rem; } }
-
-        .tournament-subtitle {
-            font-size: 0.7rem;
-            font-weight: 800;
-            color: #6B7280;
-            letter-spacing: 0.15em;
-            margin-top: 0.2rem;
-            text-transform: uppercase;
-        }
-
-        /* --- メインエリア --- */
-        .main-container {
-            flex: 1;
-            width: 100%;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+        #app-container {
+            width: 100%; 
+            display: flex; flex-direction: column; height: 100%;
             position: relative;
         }
 
-        /* --- トーナメント表 --- */
-        .bracket-container {
-            flex: 1;
-            overflow: auto;
-            padding: 1.5rem; /* 余白微調整 */
-            background-color: transparent; 
-            scrollbar-width: thin;
-            scrollbar-color: var(--color-main) #E5E7EB;
-            cursor: grab;
-            user-select: none;
-            display: flex;
-            justify-content: flex-start; 
-            align-items: flex-start;
+        .material-symbols-rounded {
+            font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 48;
+            font-size: 24px;
         }
-        .bracket-container::before, .bracket-container::after { content: ''; margin: auto; }
-        .bracket-container.active { cursor: grabbing; }
 
+        /* --- ヘッダー --- */
+        header { z-index: 50; position: relative; width: 100%; }
+        
+        .header-inner {
+            width: 100%; max-width: 1080px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 1rem; height: 4rem; position: relative;
+        }
+
+        .header-icon-btn {
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--color-main); background: #fff; color: var(--color-main);
+            transition: all 0.2s; border-radius: 0.5rem; cursor: pointer;
+            box-shadow: 2px 2px 0 0 var(--color-shadow);
+        }
+        .header-icon-btn:hover {
+            background: var(--color-main); color: #fff;
+            transform: translate(-1px, -1px); box-shadow: 3px 3px 0 0 var(--color-shadow);
+        }
+        .header-icon-btn:hover svg { fill: #fff; } 
+        .header-icon-btn:active { transform: translate(0, 0); box-shadow: none; }
+
+        /* --- メインエリア --- */
+        .main-container {
+            flex: 1; position: relative; overflow: hidden; width: 100%;
+        }
+
+        /* --- トーナメント表エリア --- */
+        .bracket-container {
+            width: 100%; height: 100%; overflow: auto;
+            padding: 4rem 2rem; cursor: grab; user-select: none;
+            display: flex; justify-content: center; align-items: center; 
+        }
+        
         .bracket-wrapper {
-            display: flex; gap: 3rem; /* ギャップ縮小 */
-            min-width: max-content; padding-bottom: 2rem;
+            display: flex; gap: 4rem; margin: auto; flex-shrink: 0;
         }
 
         .round-column {
             display: flex; flex-direction: column; justify-content: space-around;
-            gap: 1.5rem; /* カード間隔縮小 */
-            width: 360px; flex-shrink: 0;
+            gap: 1.5rem; width: 320px; flex-shrink: 0;
         }
 
         .round-header {
-            text-align: center; padding-bottom: 0.5rem; border-bottom: 3px dashed var(--color-shadow);
-            margin-bottom: 0.75rem; font-weight: 900; font-size: 1.1rem; color: var(--color-main);
-            position: sticky; top: 0; z-index: 10; background-color: var(--color-bg); letter-spacing: 0.05em;
+            text-align: center; margin-bottom: 0.5rem; font-weight: 900;
+            color: var(--color-main); font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9); border: 2px solid var(--color-main);
+            box-shadow: 2px 2px 0 0 var(--color-shadow); padding: 0.4rem; border-radius: 0.5rem;
         }
 
-        /* --- マッチカード (Compact) --- */
+        /* --- マッチカード --- */
         .match-card {
-            background-color: #FFFFFF;
-            border: 2px solid var(--color-main);
-            border-radius: 0.75rem;
-            box-shadow: 4px 4px 0 0 var(--color-shadow);
-            padding: 0.75rem; /* パディング縮小 */
-            display: flex; flex-direction: column; gap: 0.5rem; /* 内部ギャップ縮小 */
-            position: relative; margin: 0.25rem 0;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            background-color: #FFFFFF; border: 2px solid var(--color-main);
+            border-radius: 0.75rem; box-shadow: 4px 4px 0 0 var(--color-shadow);
+            padding: 0.75rem 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;
+            position: relative; transition: transform 0.2s; margin: 0.5rem 0;
         }
-        .match-card:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 0 var(--color-shadow); z-index: 10; }
+        .match-card:hover { transform: translateY(-2px); box-shadow: 6px 6px 0 0 var(--color-shadow); z-index: 10; }
 
-        .match-card.is-live { background-color: #FFFFFF; z-index: 20; }
-        .match-card.is-live.status-active {
+        /* 赤色ON AIR (Active) */
+        .match-card.is-live-active {
             border-color: var(--color-live-bg);
-            box-shadow: 6px 6px 0 0 rgba(239, 68, 68, 0.2);
+            box-shadow: 4px 4px 0 0 rgba(239, 68, 68, 0.3);
             animation: pulse-border 2s infinite;
         }
-        .match-card.is-live.status-inactive {
+        /* 灰色ON AIR (Inactive) */
+        .match-card.is-live-inactive {
             border-color: var(--color-live-inactive);
-            box-shadow: 4px 4px 0 0 rgba(107, 114, 128, 0.2);
+            box-shadow: 4px 4px 0 0 rgba(107, 114, 128, 0.3);
         }
-        
+
         @keyframes pulse-border {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        .match-header { display: flex; justify-content: space-between; align-items: center; height: 20px; }
-        .header-left-group { display: flex; gap: 6px; align-items: center; }
-
+        .match-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 4px; padding: 0 4px;
+        }
+        .header-badges { display: flex; gap: 4px; }
         .match-id {
-            background: var(--color-main); color: white; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; font-weight: 800;
+            background: var(--color-main); color: white; font-size: 0.6rem;
+            padding: 2px 6px; border-radius: 4px; font-weight: bold;
         }
-        .match-card.is-live.status-active .match-id { background: var(--color-live-bg); }
-        .match-card.is-live.status-inactive .match-id { background: #6B7280; }
-
         .bo-badge {
-            background: #F3F4F6; color: var(--color-main); font-size: 0.7rem; padding: 1px 6px;
-            border-radius: 4px; font-weight: 800; border: 2px solid #E5E7EB;
+            background: #E5E7EB; color: #4B5563; font-size: 0.6rem;
+            padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid #D1D5DB;
         }
-
+        
         .live-badge {
-            font-size: 0.7rem; font-weight: 900; padding: 1px 8px; border-radius: 9999px;
-            display: flex; align-items: center; gap: 3px; color: white; border: 2px solid transparent;
+            padding: 2px 8px; border-radius: 9999px; font-size: 0.6rem; font-weight: 900;
+            display: flex; align-items: center; gap: 4px;
         }
-        .match-card.is-live.status-active .live-badge { background-color: var(--color-live-bg); border-color: var(--color-live-bg); }
-        .match-card.is-live.status-inactive .live-badge { background-color: var(--color-live-inactive); border-color: var(--color-live-inactive); }
+        .live-badge.active { background-color: var(--color-live-bg); color: white; }
+        .live-badge.inactive { background-color: var(--color-live-inactive); color: white; opacity: 0.8; }
 
-        /* チーム行 (Compact) */
         .team-row {
             display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem;
-            border-radius: 0.5rem; background-color: #F9FAFB; border: 2px solid transparent;
-            overflow: hidden; transition: all 0.2s;
+            border-radius: 0.375rem; background-color: #F9FAFB;
+            transition: background-color 0.2s;
         }
-        .team-row.winner { background-color: #FEF3C7; border-color: #FCD34D; }
-        .team-row.winner .team-name-display { color: #000; font-weight: 900; }
-        .team-row.loser { opacity: 0.5; background-color: #FFFFFF; border-color: #F3F4F6; }
-
-        .team-label { width: 5px; height: 24px; border-radius: 2.5px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
+        .team-row.winner { background-color: #FEF3C7; font-weight: bold; }
+        .team-row.loser { opacity: 0.6; }
+        
+        .team-label { width: 4px; height: 24px; border-radius: 2px; flex-shrink: 0; }
         .label-alpha { background-color: var(--color-alpha); }
         .label-bravo { background-color: var(--color-bravo); }
 
-        .team-info-area { flex: 1; min-width: 0; display: flex; align-items: center; }
-        
         .team-name-display {
-            width: 100%; font-size: 0.95rem; font-weight: 700; line-height: 1.2;
+            flex: 1; font-size: 0.9rem; font-weight: 700;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            color: var(--color-main); cursor: pointer; transition: color 0.1s;
+            cursor: pointer; padding: 2px 4px; border-radius: 4px;
         }
-        .team-name-display:hover { color: #2563EB; text-decoration: underline; }
-        .text-undecided { color: #D1D5DB; font-weight: 600; cursor: default; }
-        .text-undecided:hover { color: #D1D5DB; text-decoration: none; }
-
-        .score-display {
-            font-size: 1.25rem; font-weight: 900; width: 1.75rem; text-align: center;
-            color: #9CA3AF; flex-shrink: 0; line-height: 1;
+        .team-name-display:hover {
+            color: var(--color-main); background-color: #E5E7EB; text-decoration: underline;
         }
-        .match-card.is-live .score-display { color: var(--color-main); }
-        
-        .win-mark { width: 20px; display: flex; justify-content: center; color: #F59E0B; opacity: 0; flex-shrink: 0; }
-        .team-row.winner .win-mark { opacity: 1; }
+        .team-name-display.withdrawn { text-decoration: line-through; color: #9CA3AF; pointer-events: none; }
+        .team-name-display.undecided { color: #9CA3AF; cursor: default; pointer-events: none; }
+        .team-name-display.undecided:hover { background-color: transparent; text-decoration: none; }
 
+        .score-display { width: 24px; text-align: center; font-weight: 900; font-size: 1.1rem; }
+        .win-icon { width: 24px; text-align: center; color: #F59E0B; }
         .match-card::after {
-            content: 'arrow_forward'; font-family: 'Material Symbols Rounded';
-            position: absolute; right: -32px; top: 50%; transform: translateY(-50%); 
-            color: #D1D5DB; font-weight: 900; font-size: 1.5rem; display: none; pointer-events: none;
+            content: '→'; position: absolute; right: -36px; top: 50%;
+            transform: translateY(-50%); color: #D1D5DB; font-weight: 900; font-size: 1.5rem; display: none;
         }
         .round-column:not(:last-child) .match-card::after { display: block; }
-        
-        .loading-state {
-            display: flex; justify-content: center; align-items: center; height: 300px; 
-            color: #9CA3AF; font-weight: 700; font-size: 1.2rem; width: 100%;
-        }
 
-        /* --- モーダル (Compact Brutalist) --- */
+        /* --- 予選中メッセージ --- */
+        .qualifying-message-container {
+            width: 100%; height: 100%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 2rem; color: #6B7280;
+        }
+        .qualifying-icon { font-size: 64px; margin-bottom: 1rem; color: #9CA3AF; }
+        .qualifying-title { font-size: 2rem; font-weight: 900; margin-bottom: 0.5rem; color: var(--color-main); }
+        .qualifying-sub { font-size: 1rem; font-weight: 700; }
+
+        /* --- Modal Common --- */
         .modal-overlay {
-            position: fixed; inset: 0; background-color: rgba(255, 255, 255, 0.8);
+            position: fixed; inset: 0; background-color: rgba(31, 41, 55, 0.6);
             backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center;
             z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
         }
         .modal-overlay.show { opacity: 1; pointer-events: auto; }
         
-        .modal-content {
-            background: white; width: 90%; max-width: 550px; max-height: 85vh;
-            border-radius: 1.25rem; overflow-y: auto;
-            border: 3px solid var(--color-main);
-            box-shadow: 8px 8px 0 0 var(--color-shadow); /* 影も少し小さく */
-            transform: scale(0.95); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column;
+        /* チーム詳細モーダル用 (team-card style) */
+        .modal-content-base {
+            background: #FFFFFF; width: 95%; max-width: 600px; max-height: 90vh;
+            border: 2px solid var(--color-main); border-radius: 1rem;
+            box-shadow: 6px 6px 0 0 var(--color-shadow);
+            display: flex; flex-direction: column; overflow: hidden;
+            transform: scale(0.95); transition: transform 0.2s;
         }
-        .modal-overlay.show .modal-content { transform: scale(1); }
+        .modal-overlay.show .modal-content-base { transform: scale(1); }
 
-        .modal-header {
-            padding: 1.5rem 1.5rem 1rem 1.5rem; /* パディング削減 */
-            border-bottom: 2px solid #E5E7EB;
-            background: #FFFFFF; position: sticky; top: 0; z-index: 10;
+        .team-card-header-bar {
+            height: 12px; width: 100%; border-bottom: 2px solid var(--color-main); flex-shrink: 0;
+            background-color: var(--color-main);
         }
-        .modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
 
-        .modal-label { 
-            font-size: 0.7rem; font-weight: 900; color: #9CA3AF; 
-            margin-bottom: 0.25rem; letter-spacing: 0.1em; text-transform: uppercase; display: block;
+        .team-card-body {
+            padding: 2rem; display: flex; flex-direction: column; overflow-y: auto;
+        }
+
+        /* --- Team Info Styles --- */
+        .header-section { margin-bottom: 1.5rem; border-bottom: 2px solid #E5E7EB; padding-bottom: 1.5rem; }
+        
+        .univ-name {
+            font-size: 1.8rem; font-weight: 800; color: #4B5563; line-height: 1.2;
+            margin-bottom: 0.25rem; letter-spacing: 0.05em;
+        }
+        .team-kana {
+            font-size: 1.1rem; font-weight: 700; color: #6B7280; margin-bottom: 0; line-height: 1.2;
+        }
+        .team-name-lg {
+            font-size: 2.5rem; font-weight: 900; line-height: 1.1; color: var(--color-main);
+            margin-bottom: 1rem; letter-spacing: -0.02em; margin-top: 0.25rem;
+        }
+
+        .circle-tag {
+            display: inline-flex; align-items: center; background-color: #F9FAFB;
+            border: 2px solid var(--color-main); border-radius: 0.75rem;
+            padding: 0.4rem 1rem 0.4rem 0.5rem; cursor: pointer;
+            box-shadow: 2px 2px 0 0 var(--color-shadow); transition: transform 0.1s;
+        }
+        .circle-tag:hover { transform: translateY(-1px); box-shadow: 3px 3px 0 0 var(--color-shadow); }
+        .circle-icon { font-size: 24px; margin-right: 0.5rem; color: #6B7280; }
+        .circle-text { font-weight: 700; font-size: 1.125rem; color: #374151; }
+
+        .avg-xp-box {
+            display: inline-block; background-color: white; color: var(--color-main);
+            font-weight: 800; font-size: 1rem; padding: 0.25rem 1rem; border-radius: 9999px;
+            box-shadow: 2px 2px 0 0 var(--color-shadow); margin-top: 0.5rem;
+            border: 2px solid var(--color-main); margin-left: 0.5rem;
+        }
+
+        .member-grid {
+            display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1rem;
+        }
+        .member-card {
+            display: flex; align-items: center; padding: 0.75rem 1rem;
+            background-color: white; border: 2px solid #E5E7EB; border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         
-        .modal-text { font-size: 0.95rem; color: #374151; line-height: 1.6; white-space: pre-wrap; font-weight: 500; }
-        
-        /* メンバーリスト */
-        .member-list-item {
-            padding: 0.75rem; border: 2px solid #E5E7EB; border-radius: 0.5rem;
-            margin-bottom: 0.5rem; background: #FFFFFF; transition: all 0.2s;
-        }
-        .member-list-item:hover { border-color: var(--color-main); transform: translate(2px, 2px); }
-
-        .member-name-row { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; line-height: 1; margin-bottom: 0.25rem; }
-        .member-name { font-weight: 800; font-size: 1.05rem; color: #1F2937; }
-        .member-kana { font-size: 0.7rem; font-weight: 700; color: #9CA3AF; }
-
-        .weapon-container { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-        .weapon-tag {
-            font-size: 0.7rem; font-weight: 700; color: #4B5563;
-            background-color: #F3F4F6; border: 1px solid #D1D5DB;
-            padding: 0.1rem 0.4rem; border-radius: 0.25rem;
+        .name-group { flex: 1; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+        .member-name { font-size: 1.25rem; font-weight: 800; color: var(--color-main); line-height: 1; }
+        .member-kana { font-size: 0.75rem; font-weight: 600; color: #9CA3AF; }
+        .member-weapon {
+            display: block; width: 100%; font-size: 0.85rem; font-weight: 600; color: #6B7280; margin-top: 0.25rem;
         }
 
-        .xp-badge {
-            display: inline-flex; align-items: center; justify-content: center;
+        .info-separator { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .info-separator-line { flex: 1; height: 2px; background-color: #E5E7EB; }
+        .info-separator-text {
+            font-weight: 800; font-size: 1rem; color: #9CA3AF; background-color: #F3F4F6;
+            padding: 0.25rem 1rem; border-radius: 9999px; letter-spacing: 0.1em;
+        }
+
+        .info-block {
+            background-color: white; border: 2px solid #E5E7EB; border-radius: 0.75rem;
+            padding: 1.25rem; margin-bottom: 1rem; position: relative;
+        }
+        .info-label {
+            position: absolute; top: -12px; left: 1rem; background-color: #F3F4F6;
+            color: #4B5563; font-weight: 700; font-size: 0.8rem; padding: 0.1rem 0.75rem;
+            border-radius: 0.5rem; border: 2px solid #E5E7EB;
+        }
+        .info-content { font-weight: 500; font-size: 1rem; line-height: 1.7; white-space: pre-wrap; color: #4B5563; }
+
+        .close-btn-area {
+            padding: 1rem; background: #F9FAFB; border-top: 1px solid #E5E7EB;
+            display: flex; justify-content: center; flex-shrink: 0;
+        }
+        .modal-close-btn {
             background: var(--color-main); color: white;
-            padding: 0.2rem 0.6rem; border-radius: 9999px; 
-            font-weight: 900; font-size: 0.9rem; letter-spacing: 0.05em;
-            box-shadow: 2px 2px 0 0 rgba(0,0,0,0.2);
+            font-weight: 800; padding: 0.5rem 2rem; border-radius: 9999px;
+            box-shadow: 2px 2px 0 0 #9CA3AF; transition: all 0.1s;
+        }
+        .modal-close-btn:hover { transform: translateY(-1px); box-shadow: 3px 3px 0 0 #9CA3AF; }
+        .modal-close-btn:active { transform: translateY(0); box-shadow: none; }
+
+
+        /* --- Circle Modal Styles --- */
+        .circle-modal-content {
+            background: white; width: 90%; max-width: 600px;
+            border: 2px solid var(--color-main); border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* サークルタグ */
-        .circle-tag-container {
-            display: inline-flex; align-items: stretch; 
-            cursor: default; transition: transform 0.1s; user-select: none;
+        .circle-modal-header {
+            padding: 1rem; border-bottom: 1px solid #E5E7EB; display: flex;
+            justify-content: space-between; align-items: center; background-color: #F9FAFB;
         }
-        .circle-tag-container.has-link { cursor: pointer; }
-        .circle-tag-container.has-link:hover { transform: translateY(-2px); }
-        .circle-tag-container.has-link:active { transform: translateY(0); }
-
-        .circle-tag-main {
-            background-color: var(--color-main); color: white;
-            padding: 0.2rem 0.6rem; border: 2px solid var(--color-main);
-            font-weight: 900; font-size: 0.8rem; letter-spacing: 0.05em;
-            display: flex; align-items: center; gap: 0.4rem;
+        .circle-modal-title { font-weight: 700; font-size: 1.25rem; color: #374151; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .circle-modal-body { padding: 2rem; overflow-y: auto; }
+        
+        .circle-img-container {
+            width: 8rem; height: 8rem; border-radius: 9999px; overflow: hidden;
+            border: 2px solid #E5E7EB; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem; background-color: #F3F4F6; margin-left: auto; margin-right: auto;
         }
-        .circle-tag-icon {
-            background-color: white; color: var(--color-main);
-            border: 2px solid var(--color-main); border-left: none;
-            padding: 0 0.4rem; display: flex; align-items: center; justify-content: center;
-            transition: background-color 0.2s;
+        .circle-univ-sub { font-size: 1rem; font-weight: 700; color: #6B7280; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; }
+        .circle-name-lg { font-size: 1.875rem; font-weight: 900; color: #1F2937; margin-bottom: 1.5rem; text-align: center; }
+        
+        .sns-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+        .sns-tag-item {
+            display: inline-flex; align-items: center; padding: 0.25rem 0.75rem;
+            background-color: white; border: 1px solid #D1D5DB; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-weight: 700; color: #4B5563; border-radius: 0.5rem; font-size: 0.875rem;
+            text-decoration: none; transition: all 0.2s; cursor: pointer;
         }
-        .circle-tag-container:hover .circle-tag-icon { background-color: #F3F4F6; }
-
-        .hidden { display: none !important; }
+        .sns-tag-item:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-color: var(--color-main); color: var(--color-main); }
+        
+        .circle-desc-box {
+            background-color: #F9FAFB; border-radius: 0.5rem; padding: 1.5rem;
+            border: 1px solid #E5E7EB;
+        }
+        .circle-desc-text { color: #374151; line-height: 1.625; white-space: pre-wrap; font-weight: 500; }
 
     </style>
 </head>
 
 <body>
 
-    <header class="viewer-header">
-        <h1 id="header-title" class="tournament-title">大会情報読み込み中...</h1>
-        <p class="tournament-subtitle">TOURNAMENT BRACKET</p>
-    </header>
+    <div id="app-container">
+        <header class="flex-shrink-0 bg-white border-b-2 border-gray-900 pt-safe z-50">
+            <div class="header-inner">
+                <div class="flex gap-2">
+                    <a href="https://x.com/daigakuhai" target="_blank" rel="noopener noreferrer" class="header-icon-btn" title="X (@daigakuhai)">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="#1F2937">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                        </svg>
+                    </a>
+                    <a href="https://www.youtube.com/@早稲田スプ研" target="_blank" rel="noopener noreferrer" class="header-icon-btn" title="YouTube (@早稲田スプ研)">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="#1F2937">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </a>
+                </div>
 
-    <main class="main-container">
-        <div class="bracket-container">
-            <div id="bracket-wrapper" class="bracket-wrapper">
-                <div class="loading-state">
-                    Loading tournament data...
+                <h1 id="tournament-title"
+                    class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                            text-lg md:text-xl font-black text-gray-900 tracking-tight whitespace-nowrap text-center w-3/5 overflow-hidden text-ellipsis">
+                    大会名読み込み中...
+                </h1>
+                <div class="w-[88px]"></div>
+            </div>
+        </header>
+
+        <main class="main-container">
+            <div class="bracket-container">
+                <div id="bracket-wrapper" class="bracket-wrapper">
+                    <div class="flex items-center justify-center w-full h-32 text-gray-400 font-bold">
+                        Loading tournament data...
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
-    <div id="team-modal" class="modal-overlay" onclick="closeTeamModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <div class="flex justify-between items-start">
-                    <div class="w-full">
-                        <div class="mb-2">
-                            <p id="m-univ" class="text-lg md:text-xl font-black text-gray-600 tracking-tight leading-none mb-2">UNIVERSITY</p>
-                            
-                            <div id="m-circle-container" class="circle-tag-container group">
-                                <div class="circle-tag-main">
-                                    <span class="material-symbols-rounded text-sm">diversity_3</span>
-                                    <span id="m-circle">CIRCLE NAME</span>
-                                </div>
-                                <div id="m-circle-indicator" class="circle-tag-icon hidden">
-                                    <span class="material-symbols-rounded text-sm">arrow_outward</span>
-                                </div>
-                            </div>
-                        </div>
+    <div id="team-modal" class="modal-overlay" onclick="handleModalOutsideClick(event)">
+        <div class="modal-content-base">
+            <div class="team-card-header-bar" id="modal-color-bar"></div>
+            <div class="team-card-body">
+                <div class="header-section">
+                    <h3 id="modal-univ" class="univ-name">-</h3>
+                    <p id="modal-kana" class="team-kana"></p>
+                    <h2 id="modal-team-name" class="team-name-lg">チーム名</h2>
 
-                        <div class="mb-2">
-                            <p id="m-name-kana" class="text-xs font-bold text-gray-400 tracking-widest mb-0 leading-none"></p>
-                            <h2 id="m-name" class="text-2xl md:text-3xl font-black text-gray-900 leading-tight">Team Name</h2>
+                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                        <div id="modal-circle-container" class="circle-tag">
+                            <span class="material-symbols-rounded circle-icon">diversity_3</span>
+                            <span id="modal-circle" class="circle-text">-</span>
                         </div>
-                        
-                        <div class="flex items-center gap-2">
-                            <span id="m-xp" class="xp-badge">平均XP ----</span>
-                        </div>
+                        <div id="modal-xp-tag" class="avg-xp-box hidden">XP <span id="modal-xp-val"></span></div>
                     </div>
-                    <button onclick="closeTeamModal()" class="flex-shrink-0 p-1 hover:bg-gray-100 rounded-full text-gray-400 transition-colors">
-                        <span class="material-symbols-rounded" style="font-size: 28px;">close</span>
-                    </button>
                 </div>
+
+                <div id="modal-members" class="member-grid"></div>
+
+                <div class="info-separator">
+                    <div class="info-separator-line"></div>
+                    <div class="info-separator-text">TEAM INFO</div>
+                    <div class="info-separator-line"></div>
+                </div>
+
+                <div id="modal-info-container"></div>
             </div>
             
-            <div class="modal-body">
-                <div>
-                    <span class="modal-label">意気込み</span>
-                    <div class="p-3 bg-gray-50 rounded-lg border-2 border-gray-100">
-                        <p id="m-comment" class="modal-text">コメント</p>
-                    </div>
-                </div>
-
-                <div>
-                    <span class="modal-label">実績</span>
-                    <p id="m-records" class="modal-text text-sm text-gray-500 font-bold border-l-4 border-gray-300 pl-3">実績なし</p>
-                </div>
-
-                <div>
-                    <span class="modal-label">メンバー</span>
-                    <div id="m-members"></div>
-                </div>
-
-                <div class="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-200 shadow-[4px_4px_0_0_#FEF08A]">
-                    <span class="modal-label !text-yellow-600 !mb-1">応援メッセージ</span>
-                    <p id="m-message" class="modal-text text-yellow-900 font-bold">メッセージ</p>
-                </div>
+            <div class="close-btn-area">
+                <button class="modal-close-btn" onclick="closeTeamModal()">閉じる</button>
             </div>
         </div>
     </div>
 
-    <div id="circle-modal" class="modal-overlay" onclick="closeCircleModal(event)">
-        <div class="modal-content bg-white" onclick="event.stopPropagation()">
-            <div class="p-4 border-b-2 border-gray-100 flex justify-between items-center bg-gray-50">
-                <h3 class="font-black text-lg text-gray-800 flex items-center gap-2">
-                    <span class="material-symbols-rounded text-blue-600">diversity_3</span> CIRCLE INFO
+    <div id="circle-modal" class="modal-overlay">
+        <div class="circle-modal-content">
+            <div class="circle-modal-header">
+                <h3 class="circle-modal-title">
+                    <span class="material-symbols-rounded">diversity_3</span> CIRCLE INFO
                 </h3>
-                <button onclick="closeCircleModal()" class="p-1 hover:bg-gray-200 rounded-full text-gray-400 transition-colors">
-                    <span class="material-symbols-rounded" style="font-size: 24px;">close</span>
+                <button onclick="closeCircleModal()" class="p-2 hover:bg-gray-200 rounded-full text-gray-500 transition-all flex items-center justify-center">
+                    <span class="material-symbols-rounded">close</span>
                 </button>
             </div>
-            <div class="p-6 overflow-y-auto bg-white">
-                <div class="flex flex-col items-center text-center mb-6">
-                    <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-900 shadow-md mb-3 bg-gray-200">
-                        <img id="modal-c-img" src="" alt="サークルアイコン" class="w-full h-full object-cover"
-                            onerror="this.src='data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%239ca3af\' viewBox=\'0 0 24 24\'%3e%3cpath d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z\'/%3e%3c/svg%3e'">
+            <div class="circle-modal-body">
+                <div class="flex flex-col items-center text-center mb-8">
+                    <div class="circle-img-container">
+                        <img id="modal-circle-img" src="" alt="icon" class="w-full h-full object-cover"
+                            onerror="this.src='data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23e5e7eb\' viewBox=\'0 0 24 24\'%3e%3cpath d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z\'/%3e%3c/svg%3e'">
                     </div>
-                    <p id="modal-c-univ" class="text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">UNIVERSITY</p>
-                    <h2 id="modal-c-name" class="text-2xl font-black text-gray-900 mb-3">Circle Name</h2>
-                    
-                    <div class="flex flex-wrap justify-center gap-2 mb-2">
-                        <a id="modal-c-id" href="#" target="_blank" rel="noopener noreferrer"
-                           class="inline-flex items-center px-3 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-all active:translate-y-[1px]">
-                           </a>
-                        <span id="modal-c-win" class="inline-flex items-center px-3 py-1 rounded-md bg-orange-50 text-orange-700 text-xs font-bold border border-orange-200"></span>
+                    <p id="modal-circle-univ" class="circle-univ-sub">UNIVERSITY</p>
+                    <h2 id="modal-circle-name" class="circle-name-lg">サークル名</h2>
+                    <div class="sns-tags">
+                        <a id="modal-circle-id" href="#" target="_blank" class="sns-tag-item hidden"></a>
+                        <a id="modal-circle-win" href="#" target="_blank" class="sns-tag-item hidden"></a>
                     </div>
                 </div>
-                <div class="bg-gray-50 rounded-lg p-4 border-2 border-gray-100">
-                    <p id="modal-c-comment" class="text-gray-700 leading-relaxed whitespace-pre-wrap font-bold text-sm"></p>
+                <div class="circle-desc-box">
+                    <p id="modal-circle-comment" class="circle-desc-text"></p>
                 </div>
             </div>
         </div>
@@ -414,160 +459,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-        // --- DATA CONSTANTS ---
-        const CIRCLE_DATA = [
-            {
-                "circle-university": "横浜国立大学", "circle-name": "浜イカ",
-                "circle-social-img": "https://pbs.twimg.com/profile_images/1459543611629256704/tlF19GrW_400x400.jpg",
-                "circle-social-id": "hama_ika4559", "circle-social-win": "浜イカWIN",
-                "circle-comment": "スプラトゥーンの企画だけでなくBBQ等の対面企画も定期的に開催しつつ、学部生から院生、エンジョイ勢からガチ勢まで、みんな和気あいあいと活動しています！！"
-            },
-            {
-                "circle-university": "立命館大学", "circle-name": "リツメイカ",
-                "circle-social-img": "https://pbs.twimg.com/profile_images/1797446711532818432/Fr3fFT_5_400x400.jpg",
-                "circle-social-id": "RitsumeIKA_lab", "circle-social-win": "リツメイカWIN",
-                "circle-comment": "ガチ勢もエンジョイ勢もみんな仲良しほのぼの平和なリツメイカです！今年は色々な大学さんと交流戦をしたいなと思ってます🦑"
-            },
-            {
-                "circle-university": "大阪公立大学", "circle-name": "OMUスプラ部",
-                "circle-social-img": "https://pbs.twimg.com/profile_images/1907480475419176960/zJ5eAz4O_400x400.jpg",
-                "circle-social-id": "hamu_splatoon3", "circle-social-win": "ハム大スプラ部WIN",
-                "circle-comment": "幅広いパワー帯の部員が各々好きな遊び方で楽しんでいます！<br>キャンパス関係なくオンでわいわいやってます！<br>他大学さんとの交流にも興味あります😎"
-            },
-            {
-                "circle-university": "電気通信大学", "circle-name": "squec",
-                "circle-social-img": "https://pbs.twimg.com/profile_images/1847300499848187904/rbB4Ay48_400x400.jpg",
-                "circle-social-id": "UECSplatoon", "circle-social-win": "squecWIN",
-                "circle-comment": "オンオフ問わず多彩な大会を開催し、学部生から院生まで年齢に関わらず仲良くスプラトゥーンをしています🎶"
-            },
-            {
-                "circle-university": "筑波大学", "circle-name": "Tsuquid",
-                "circle-social-img": "https://pbs.twimg.com/profile_images/1567846700299202563/h3goVWH5_400x400.jpg",
-                "circle-social-id": "splatoon_itf_ut", "circle-social-win": "つくいっどWIN",
-                "circle-comment": "ガチでもエンジョイでも大歓迎‼️サークル内大会やオフ会などイベントも盛りだくさん‼️<br>OB・OG含め学年問わずみんなで楽しく活動しています‼️🦑✨"
-            },
-            {
-                "circle-university": "慶應義塾大学", "circle-name": "慶應スプラ同好会",
-                "circle-social-img": "https://pbs.twimg.com/profile_images/1634460254842015750/a1NpOHTV_400x400.jpg",
-                "circle-social-id": "keiospla", "circle-social-win": "慶スプWIN",
-                "circle-comment": "ガチ勢もエンジョイ勢もみんな仲良く楽しくやってます♪<br>他大学とのイベントや交流も活発です！"
-            }
-        ];
-
-        const TEAMS_DATA = [
-            {
-                "id": "team_001", "teamName": "フロゲーマー", "teamName_kana": "----",
-                "university": "横浜国立大学", "circle": "浜イカ",
-                "comment": "実績はありませんが、風呂からのプレイが最強であることを示して爪痕を残せるように頑張ります！！編成に組み込む武器同士のシナジーを活かしてチーム戦を制します！",
-                "records": "----", "message": "この大会のみのチームではあるもののチーム仲がとてもよく、練習の対抗戦も楽しそうにやっているので、ぜひ優勝してほしいです！",
-                "p1_name": "ぁじ", "p1_name_kana": "----", "p1_weapon": "バケットスロッシャー、ノヴァブラスターネオ、イグザミナー",
-                "p2_name": "ゆづ", "p2_name_kana": "----", "p2_weapon": "ドライブワイパー、R-PEN/5H、RブラスターエリートWNTR",
-                "p3_name": "283", "p3_name_kana": "つばさ", "p3_weapon": "バケットスロッシャー、ヒッセンヒュー、R-PEN/5H",
-                "p4_name": "コっペ", "p4_name_kana": "----", "p4_weapon": "シャープマーカー、プライムシューター、N-ZAP85",
-                "team_average_xp": "2878"
-            },
-            {
-                "id": "team_002", "teamName": "スターミー、立つな", "teamName_kana": "----",
-                "university": "立命館大学", "circle": "リツメイカ",
-                "comment": "1年生3人の成長を楽しみにしながらも、サークルの名を背負っているので頑張りたいです。",
-                "records": "----", "message": "最近のリツメイカは一度の通話に24人も集まるほどの盛り上がり！<br>そんな中で開催される「大学杯 真打」では、リツメイカがさらに熱気を帯びること間違いなし🔥<br>今回出場するのは、圧倒的な立ち回りとキルで魅せる前線使いのそろ、冷静な判断でチームを支えるマルチプレイヤーもく、<br>そしてスプラトゥーンで初めての大会に挑むフレッシュなぼてぇぼぉの期待の1回生たち、さらに安定感抜群で背中を任せられる2回生ペン使いクマノミの4人チーム！<br>勢い・知略・挑戦・信頼がそろったこのメンバーなら、きっとリツメイカをさらに盛り上げてくれるはず！<br>たくさん暴れておいで〜！！",
-                "p1_name": "クマノミ", "p1_name_kana": "----", "p1_weapon": "R-PEN5H、リッター4K",
-                "p2_name": "solo♪", "p2_name_kana": "----", "p2_weapon": "シャープマーカー、スプラシューター、ジェットスイーパーコブラ",
-                "p3_name": "もく", "p3_name_kana": "----", "p3_weapon": "スプラマニューバー、Rブラスターエリートデコ",
-                "p4_name": "ぼてぇぼぉ", "p4_name_kana": "----", "p4_weapon": "ヴァリアブルローラー、フィンセント、スプラローラー",
-                "team_average_xp": "2898"
-            },
-            {
-                "id": "team_003", "teamName": "無視すんなぁぁぁぁぁ", "teamName_kana": "----",
-                "university": "大阪公立大学", "circle": "OMUスプラ部",
-                "comment": "最強のメンツで今回こそは優勝します！",
-                "records": "第八回大学杯+優勝(選手1,2,4)", "message": "最後まで立ってるのはこの4人です。<br>全員薙ぎ倒してきてください📣",
-                "p1_name": "ヒロトX", "p1_name_kana": "----", "p1_weapon": "ロングブラスター、ロングブラスターカスタム",
-                "p2_name": "さいぼう", "p2_name_kana": "----", "p2_weapon": "Rペン、ケルビン",
-                "p3_name": "ぐると", "p3_name_kana": "----", "p3_weapon": "バケツ",
-                "p4_name": "22", "p4_name_kana": "----", "p4_weapon": "スピコラ、シャカ",
-                "team_average_xp": "3266"
-            },
-            {
-                "id": "team_004", "teamName": "卍すとろんぐ卍", "teamName_kana": "まんじすとろんぐまんじ",
-                "university": "明治薬科大学", "circle": "スプラトゥーン部",
-                "comment": "ビーコン使って暴れます！",
-                "records": "----", "message": "部員みんなで応援してます頑張ってください！！！",
-                "p1_name": "たーちゃん‼︎", "p1_name_kana": "----", "p1_weapon": "52ガロン",
-                "p2_name": "マルチアサンつべ", "p2_name_kana": "----", "p2_weapon": "ホクサイヒュー",
-                "p3_name": "やーちゃん‼︎", "p3_name_kana": "----", "p3_weapon": "スプラシューター煌",
-                "p4_name": "えたーなる", "p4_name_kana": "----", "p4_weapon": "シャープマーカー",
-                "team_average_xp": "2477"
-            },
-            {
-                "id": "team_005", "teamName": "最終防衛線牙璃王", "teamName_kana": "さいしゅうぼうえいらいんがりおう",
-                "university": "関西大学", "circle": "関大スプラ",
-                "comment": "弊サークルメンバーのTOP4が初めて集結したので優勝させて頂きます🏆",
-                "records": "----", "message": "----",
-                "p1_name": "てぃーら", "p1_name_kana": "----", "p1_weapon": "ロングブラスター、エリデコ",
-                "p2_name": "mima", "p2_name_kana": "----", "p2_weapon": "パブロヒュー",
-                "p3_name": "がりお", "p3_name_kana": "----", "p3_weapon": "R-PEN5/H、リッター4k",
-                "p4_name": "ましろ", "p4_name_kana": "----", "p4_weapon": "クアッド、ドライブワイパー",
-                "team_average_xp": "2953"
-            },
-            {
-                "id": "team_006", "teamName": "squec", "teamName_kana": "スクエック",
-                "university": "電気通信大学", "circle": "squec",
-                "comment": "知名度下から1番大学、1番上になりたいです！！！！！",
-                "records": "多分ないよ", "message": "(院生を除いたら)squecで4人しかいないXp3000超えを集めた最強チーム！ squec代表の顔つきで優勝してくれ〜〜〜〜〜",
-                "p1_name": "ゆきうさぎ", "p1_name_kana": "----", "p1_weapon": "Rpen5H, スプラシューター, Nzap85",
-                "p2_name": "まぐきっど", "p2_name_kana": "----", "p2_weapon": "ドライブワイパー, シャープマーカー, シャープマーカーネオ",
-                "p3_name": "ヤマト", "p3_name_kana": "----", "p3_weapon": "スプラシューター, シャープマーカー, バケットスロッシャー",
-                "p4_name": "コーン", "p4_name_kana": "----", "p4_weapon": "S-blast91, ロングブラスター, ロングブラスターカスタム",
-                "team_average_xp": "3045"
-            },
-            {
-                "id": "team_007", "teamName": "Unlimited ITF.", "teamName_kana": "----",
-                "university": "筑波大学", "circle": "Tsuquid",
-                "comment": "古井戸や　イカが飛び込む　マンメンミ🦑",
-                "records": "----", "message": "Tsuquidの勝利をIMAGINE THE FUTURE. <br>Tsuquid自慢の精鋭たちが個性的なメンバーとブキで大活躍間違いなし！！<br>大学杯真打の未来を塗り替えるのはこのチームです！<br>by サークル代表　たべ",
-                "p1_name": "せりーぬ", "p1_name_kana": "----", "p1_weapon": "ハイドラント圧、ハイドラント、ハイドラントカスタム",
-                "p2_name": "のっち", "p2_name_kana": "----", "p2_weapon": "ノヴァブラスターネオ",
-                "p3_name": "ysk", "p3_name_kana": "----", "p3_weapon": "R-PEN/5H、クーゲルシュライバー、シャープマーカー",
-                "p4_name": "メガネ", "p4_name_kana": "----", "p4_weapon": "スパイガジェット",
-                "team_average_xp": "2926"
-            },
-            {
-                "id": "team_008", "teamName": "RMpaches", "teamName_kana": "----",
-                "university": "慶應義塾大学", "circle": "慶應スプラ同好会",
-                "comment": "実績はスプゴー全敗です。意気込みはエリアをサメライドで取ったるで〜！戦略はモップリンと鉛筆でライン維持して52ガロンとスクスロが自由に動きます。52ガロンの華麗なステップに注目！です。嘘ですなんでもいいです。",
-                "records": "スプゴー全敗", "message": "お互いをよく理解していて抜群のチームワークですチームの仲の良さも1番です！",
-                "p1_name": "ぬち", "p1_name_kana": "----", "p1_weapon": "フィンセント",
-                "p2_name": "よっしー", "p2_name_kana": "----", "p2_weapon": "モップリン角",
-                "p3_name": "ジョンソン", "p3_name_kana": "----", "p3_weapon": "鉛筆",
-                "p4_name": "ありすもか", "p4_name_kana": "----", "p4_weapon": "52ガロン",
-                "team_average_xp": "3048"
-            },
-            {
-                "id": "team_009", "teamName": "芋煮会", "teamName_kana": "----",
-                "university": "九州工業大学", "circle": "QTSSスプラ部門",
-                "comment": "チルい芋煮会を目指して頑張ります",
-                "records": "----", "message": "QTSSの最強を集めました 設立からまだ若いですがぶちかましてもらいます！",
-                "p1_name": "Tago", "p1_name_kana": "----", "p1_weapon": "プライムシューター",
-                "p2_name": "れーる", "p2_name_kana": "----", "p2_weapon": "シャープマーカー",
-                "p3_name": "じゃがいも", "p3_name_kana": "----", "p3_weapon": "R-PEN/5H",
-                "p4_name": "ぽてとん", "p4_name_kana": "----", "p4_weapon": "デュアルスイーパー",
-                "team_average_xp": "2908"
-            },
-            {
-                "id": "team_010", "teamName": "公家流フカヒレスープ", "teamName_kana": "----",
-                "university": "東京電機大学", "circle": "東京電機大学e-sports部 スプラ部門",
-                "comment": "デンタル打開頑張ります",
-                "records": "----", "message": "----",
-                "p1_name": "しゃーく", "p1_name_kana": "----", "p1_weapon": "赤ペン、青ペン、デンタルミント",
-                "p2_name": "リクーゲル", "p2_name_kana": "----", "p2_weapon": "クーゲル、ザミナー、バレル",
-                "p3_name": "みと", "p3_name_kana": "----", "p3_weapon": "クラブラ、sブラ、ホッカス",
-                "p4_name": "ちゅうか", "p4_name_kana": "----", "p4_weapon": "トラスト、トラコラ、虹弓",
-                "team_average_xp": "2736"
-            }
-        ];
-
-        // --- Firebase Init ---
         const firebaseConfig = {
             apiKey: "AIzaSyAotBKDxazOEtOv_IzoqW9bNPQXaz7a3vA",
             authDomain: "daigakuhai-support-fb.firebaseapp.com",
@@ -582,97 +473,143 @@
         const tournamentRef = doc(db, "state", "tournament");
         const settingsRef = doc(db, "state", "settings");
 
-        // --- Variables ---
-        let teamsData = TEAMS_DATA.map(t => ({ id: t.id, name: t.teamName }));
-        if (!teamsData.some(t => t.id === "THE_SEED")) {
-            teamsData.unshift({ id: "THE_SEED", name: "シード/棄権" }); 
-        }
-
+        let teamsMap = new Map();
+        let circleData = [];
         let currentFormat = 8;
-        let tournamentData = { format: 8, matches: {}, roundNames: {} };
+        let tournamentData = { matches: {}, roundNames: {} };
         let tournamentSettings = {
-            matchFormat: { other: 'BO3', semis: 'BO5', finals: 'BO5' },
-            tournamentName: "大会名未設定"
+            matchFormat: { other: 'BO3', semis: 'BO5', finals: 'BO5' }
         };
 
+        const SEED_ID = "THE_SEED";
         const bracketWrapper = document.getElementById('bracket-wrapper');
-        const headerTitle = document.getElementById('header-title');
+        const titleEl = document.getElementById('tournament-title');
 
-        // --- Main Init ---
+        // Team Modal Elements
+        const modalEl = document.getElementById('team-modal');
+        const mEl = {
+            bar: document.getElementById('modal-color-bar'),
+            univ: document.getElementById('modal-univ'),
+            kana: document.getElementById('modal-kana'),
+            name: document.getElementById('modal-team-name'),
+            circle: document.getElementById('modal-circle'),
+            circleContainer: document.getElementById('modal-circle-container'),
+            xpTag: document.getElementById('modal-xp-tag'),
+            xpVal: document.getElementById('modal-xp-val'),
+            members: document.getElementById('modal-members'),
+            infoContainer: document.getElementById('modal-info-container')
+        };
+
+        // Circle Modal Elements
+        const cModalEl = document.getElementById('circle-modal');
+        const cmEl = {
+            img: document.getElementById('modal-circle-img'),
+            univ: document.getElementById('modal-circle-univ'),
+            name: document.getElementById('modal-circle-name'),
+            id: document.getElementById('modal-circle-id'),
+            win: document.getElementById('modal-circle-win'),
+            comment: document.getElementById('modal-circle-comment')
+        };
+
         async function init() {
-            setupFirestoreListener();
+            await Promise.all([fetchTeams(), fetchCircles()]);
+            setupFirestoreListeners();
             setupDragScroll();
         }
 
-        function setupDragScroll() {
-            const slider = document.querySelector('.bracket-container');
-            let isDown = false;
-            let startX, scrollLeft, startY, scrollTop;
-
-            slider.addEventListener('mousedown', (e) => {
-                isDown = true;
-                slider.classList.add('active');
-                startX = e.pageX - slider.offsetLeft;
-                scrollLeft = slider.scrollLeft;
-                startY = e.pageY - slider.offsetTop;
-                scrollTop = slider.scrollTop;
-            });
-            slider.addEventListener('mouseleave', () => { isDown = false; slider.classList.remove('active'); });
-            slider.addEventListener('mouseup', () => { isDown = false; slider.classList.remove('active'); });
-            slider.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - slider.offsetLeft;
-                const y = e.pageY - slider.offsetTop;
-                slider.scrollLeft = scrollLeft - (x - startX);
-                slider.scrollTop = scrollTop - (y - startY);
-            });
+        async function fetchTeams() {
+            try {
+                const res = await fetch('../json/teams.json');
+                const data = await res.json();
+                data.forEach(t => teamsMap.set(t.id, t));
+                teamsMap.set(SEED_ID, { id: SEED_ID, teamName: "シード", university: "-", circle: "-" });
+            } catch (e) { console.error("Fetch teams error", e); }
         }
 
-        // --- Firestore ---
-        function setupFirestoreListener() {
+        async function fetchCircles() {
+            try {
+                const res = await fetch('../json/circle-info.json');
+                if (res.ok) circleData = await res.json();
+            } catch (e) { console.error("Fetch circles error", e); }
+        }
+
+        function setupFirestoreListeners() {
+            onSnapshot(settingsRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    tournamentSettings = { ...tournamentSettings, ...data };
+                    if (data.tournamentName) {
+                        titleEl.textContent = `${data.tournamentName} 決勝トーナメント`;
+                    } else {
+                        titleEl.textContent = "決勝トーナメント";
+                    }
+                    if(tournamentData.matches) render();
+                }
+            });
+
             onSnapshot(tournamentRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     tournamentData = data;
                     if (!tournamentData.matches) tournamentData.matches = {};
-                    if (!tournamentData.roundNames) tournamentData.roundNames = {};
-                    if (tournamentData.format) {
-                        currentFormat = parseInt(tournamentData.format);
-                    }
-                    renderBracket();
-                }
-            });
-
-            onSnapshot(settingsRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if(data.tournamentName) {
-                        headerTitle.textContent = `${data.tournamentName} トーナメント表`;
-                    }
-                    if(data.matchFormat) {
-                        tournamentSettings.matchFormat = data.matchFormat;
-                        renderBracket();
-                    }
+                    if (tournamentData.format) currentFormat = parseInt(tournamentData.format);
+                    render();
                 }
             });
         }
 
-        function getRoundFormat(roundNum, totalRounds) {
-            const settings = tournamentSettings.matchFormat || { other: 'BO3', semis: 'BO5', finals: 'BO5' };
-            if (roundNum === totalRounds) return settings.finals;
-            if (roundNum === totalRounds - 1) return settings.semis;
-            return settings.other;
+        function checkQualifyingStatus() {
+            if (!currentFormat || !tournamentData.matches) return true;
+            const matchCountR1 = currentFormat / 2;
+            let isFilled = true;
+            for (let m = 1; m <= matchCountR1; m++) {
+                const matchId = `r1_m${m}`;
+                const match = tournamentData.matches[matchId];
+                if (!match || !match.alpha || !match.bravo) {
+                    isFilled = false;
+                    break;
+                }
+            }
+            return !isFilled;
         }
 
-        function getTeamName(id) {
-            if (!id) return "未決定";
-            if (id === "THE_SEED") return "シード";
-            const t = TEAMS_DATA.find(t => t.id === id);
-            return t ? t.teamName : "不明なチーム";
+        function render() {
+            if (checkQualifyingStatus()) {
+                renderQualifyingScreen();
+            } else {
+                renderBracket();
+            }
         }
 
-        // --- Rendering ---
+        function renderQualifyingScreen() {
+            bracketWrapper.innerHTML = `
+                <div class="qualifying-message-container">
+                    <span class="material-symbols-rounded qualifying-icon">sports_esports</span>
+                    <h2 class="qualifying-title">予選進行中</h2>
+                    <p class="qualifying-sub">決勝トーナメントの組み合わせ決定まで<br>もうしばらくお待ちください</p>
+                </div>
+            `;
+        }
+
+        function checkActiveLive(matchId, roundNum) {
+            const match = tournamentData.matches[matchId];
+            if (!match || !match.isLive) return false;
+            if (match.winner) return false;
+
+            const hasTeams = match.alpha && match.bravo && match.alpha !== SEED_ID && match.bravo !== SEED_ID && !match.alphaWithdraw && !match.bravoWithdraw;
+            if (!hasTeams) return false;
+
+            for (let r = 1; r < roundNum; r++) {
+                const matchCount = currentFormat / Math.pow(2, r);
+                for (let m = 1; m <= matchCount; m++) {
+                    const prevId = `r${r}_m${m}`;
+                    const prevMatch = tournamentData.matches[prevId];
+                    if (prevMatch && prevMatch.isLive && !prevMatch.winner) return false; 
+                }
+            }
+            return true;
+        }
+
         function renderBracket() {
             bracketWrapper.innerHTML = '';
             const totalRounds = Math.log2(currentFormat);
@@ -681,15 +618,15 @@
                 const roundCol = document.createElement('div');
                 roundCol.className = 'round-column';
                 
-                const header = document.createElement('div');
-                header.className = 'round-header';
                 let defaultName = `ラウンド ${r}`;
                 if (r === totalRounds) defaultName = "決勝";
                 else if (r === totalRounds - 1) defaultName = "準決勝";
-                else if (r === totalRounds - 2 && totalRounds > 2) defaultName = "準々決勝";
-
-                const displayName = tournamentData.roundNames && tournamentData.roundNames[r] ? tournamentData.roundNames[r] : defaultName;
-                header.textContent = displayName;
+                
+                const rName = tournamentData.roundNames && tournamentData.roundNames[r] ? tournamentData.roundNames[r] : defaultName;
+                
+                const header = document.createElement('div');
+                header.className = 'round-header';
+                header.textContent = rName;
                 roundCol.appendChild(header);
 
                 const matchCount = currentFormat / Math.pow(2, r);
@@ -699,223 +636,218 @@
                     const matchId = `r${r}_m${m}`;
                     const matchData = tournamentData.matches[matchId] || { alpha: null, bravo: null, scoreA: 0, scoreB: 0, winner: null, isLive: false };
                     
-                    const alphaName = getTeamName(matchData.alpha);
-                    const bravoName = getTeamName(matchData.bravo);
-                    
-                    const card = createMatchCard(matchId, matchData, alphaName, bravoName, boType);
+                    const isActiveLive = checkActiveLive(matchId, r);
+                    const isAnyLive = matchData.isLive === true;
+
+                    const card = createMatchCard(matchId, matchData, boType, isAnyLive, isActiveLive);
                     roundCol.appendChild(card);
                 }
                 bracketWrapper.appendChild(roundCol);
             }
         }
 
-        function createMatchCard(matchId, data, alphaName, bravoName, boType) {
-            const hasTeams = !!data.alpha && !!data.bravo;
-            const isFinished = !!data.winner;
-            const isActiveContext = hasTeams && !isFinished;
-            const statusClass = isActiveContext ? 'status-active' : 'status-inactive';
-
+        function createMatchCard(matchId, data, boType, isAnyLive, isActiveLive) {
             const div = document.createElement('div');
-            div.className = `match-card ${data.isLive ? `is-live ${statusClass}` : ''}`;
+            let statusClass = '';
+            if (isAnyLive) {
+                statusClass = isActiveLive ? 'is-live-active' : 'is-live-inactive';
+            }
+            div.className = `match-card ${statusClass}`;
             
             const header = document.createElement('div');
             header.className = 'match-header';
             
-            const headerLeft = document.createElement('div');
-            headerLeft.className = 'header-left-group';
+            const badges = document.createElement('div');
+            badges.className = 'header-badges';
+            badges.innerHTML = `
+                <span class="match-id">${matchId.toUpperCase().replace('_', '-')}</span>
+                <span class="bo-badge">${boType}</span>
+            `;
+            header.appendChild(badges);
 
-            const idBadge = document.createElement('span');
-            idBadge.className = 'match-id';
-            idBadge.textContent = matchId.toUpperCase().replace('_', '-');
-            
-            const boBadge = document.createElement('span');
-            boBadge.className = 'bo-badge';
-            boBadge.textContent = boType;
-
-            headerLeft.appendChild(idBadge);
-            headerLeft.appendChild(boBadge);
-            header.appendChild(headerLeft);
-
-            if (data.isLive) {
-                const liveBadge = document.createElement('span');
-                liveBadge.className = 'live-badge';
-                const icon = isActiveContext ? 'sensors' : 'pause_circle';
-                liveBadge.innerHTML = `<span class="material-symbols-rounded" style="font-size: 14px;">${icon}</span>ON AIR`;
+            // ON AIR Badge
+            if (isAnyLive) {
+                const liveBadge = document.createElement('div');
+                const badgeClass = isActiveLive ? 'live-badge active' : 'live-badge inactive';
+                // テキストは常にON AIR
+                liveBadge.className = badgeClass;
+                liveBadge.innerHTML = `<span class="material-symbols-rounded" style="font-size: 14px;">sensors</span>ON AIR`;
                 header.appendChild(liveBadge);
             }
 
             div.appendChild(header);
-
-            div.appendChild(createTeamRow('alpha', data, alphaName, data.alpha));
-            div.appendChild(createTeamRow('bravo', data, bravoName, data.bravo));
+            div.appendChild(createTeamRow('alpha', data));
+            div.appendChild(createTeamRow('bravo', data));
 
             return div;
         }
 
-        function createTeamRow(side, data, nameDisplay, teamId) {
-            const row = document.createElement('div');
+        function createTeamRow(side, data) {
+            const teamId = side === 'alpha' ? data.alpha : data.bravo;
+            const score = side === 'alpha' ? data.scoreA : data.scoreB;
             const isWinner = data.winner === side;
             const isLoser = data.winner && data.winner !== side;
+            const isWithdrawn = data[side + 'Withdraw'] === true;
+            const isSeed = teamId === SEED_ID;
             
+            const teamObj = teamsMap.get(teamId);
+            const teamName = teamObj ? teamObj.teamName : "未決定";
+
+            const row = document.createElement('div');
             row.className = `team-row ${isWinner ? 'winner' : (isLoser ? 'loser' : '')}`;
             
-            const labelClass = side === 'alpha' ? 'label-alpha' : 'label-bravo';
-            const score = side === 'alpha' ? data.scoreA : data.scoreB;
-
-            let contentHTML = `<div class="team-label ${labelClass}"></div>`;
+            let html = `<div class="team-label ${side === 'alpha' ? 'label-alpha' : 'label-bravo'}"></div>`;
             
-            const undecidedClass = nameDisplay === "未決定" ? "text-undecided" : "";
+            let nameClass = "team-name-display";
+            if (!teamId) nameClass += " undecided";
+            else if (isWithdrawn) nameClass += " withdrawn";
             
-            let nameHTML = "";
-            if(teamId && teamId !== "THE_SEED" && nameDisplay !== "未決定") {
-                nameHTML = `<div class="team-name-display" title="クリックして詳細" onclick="openTeamModal('${teamId}')">${nameDisplay}</div>`;
-            } else {
-                nameHTML = `<div class="team-name-display ${undecidedClass}">${nameDisplay}</div>`;
-            }
-
-            contentHTML += `
-                <div class="team-info-area">
-                    ${nameHTML}
-                </div>
-            `;
-
-            contentHTML += `<div class="score-display">${score}</div>`;
+            const clickAttr = (teamId && !isSeed && !isWithdrawn) ? `onclick="openTeamModal('${teamId}')"` : "";
             
-            contentHTML += `
-                <div class="win-mark">
-                    <span class="material-symbols-rounded" style="font-size: 20px;">emoji_events</span>
-                </div>
-            `;
+            html += `<div class="${nameClass}" ${clickAttr} title="${teamId ? 'クリックして詳細を表示' : ''}">${teamName}</div>`;
 
-            row.innerHTML = contentHTML;
-            return row;
-        }
-
-        // --- Modal Logic (Teams) ---
-        window.openTeamModal = (teamId) => {
-            const team = TEAMS_DATA.find(t => t.id === teamId);
-            if(!team) return;
-
-            document.getElementById('m-name').textContent = team.teamName;
-            
-            // Team Kana Logic (Remove space if empty)
-            const nameKanaEl = document.getElementById('m-name-kana');
-            if (team.teamName_kana && team.teamName_kana !== "----") {
-                nameKanaEl.textContent = team.teamName_kana;
-                nameKanaEl.classList.remove('hidden');
-            } else {
-                nameKanaEl.textContent = "";
-                nameKanaEl.classList.add('hidden');
-            }
-
-            document.getElementById('m-univ').textContent = team.university;
-            
-            // Circle Tag Logic
-            const circleContainer = document.getElementById('m-circle-container');
-            const circleNameEl = document.getElementById('m-circle');
-            const circleIndicator = document.getElementById('m-circle-indicator');
-            
-            circleNameEl.textContent = team.circle;
-            
-            const hasCircleInfo = CIRCLE_DATA.some(c => c['circle-name'] === team.circle);
-            if (hasCircleInfo) {
-                circleContainer.classList.add('has-link');
-                circleContainer.onclick = () => openCircleModal(team.circle);
-                circleContainer.title = "サークル情報を表示";
-                circleIndicator.classList.remove('hidden');
-            } else {
-                circleContainer.classList.remove('has-link');
-                circleContainer.onclick = null;
-                circleContainer.title = "";
-                circleIndicator.classList.add('hidden');
-            }
-
-            document.getElementById('m-xp').textContent = `平均XP ${team.team_average_xp}`;
-            document.getElementById('m-comment').innerHTML = team.comment || "コメントなし";
-            document.getElementById('m-message').innerHTML = team.message || "----";
-            document.getElementById('m-records').innerHTML = team.records || "なし";
-
-            const memContainer = document.getElementById('m-members');
-            memContainer.innerHTML = '';
-            for(let i=1; i<=4; i++) {
-                const name = team[`p${i}_name`];
-                const nameKana = team[`p${i}_name_kana`];
-                const weaponStr = team[`p${i}_weapon`];
-                
-                if(name && name !== "----") {
-                    const div = document.createElement('div');
-                    div.className = 'member-list-item';
-                    
-                    // Create Kana HTML if exists
-                    const kanaHtml = (nameKana && nameKana !== "----") 
-                        ? `<span class="member-kana">${nameKana}</span>` 
-                        : '';
-
-                    // Split weapons into tags
-                    let weaponsHtml = '';
-                    if (weaponStr) {
-                        const weapons = weaponStr.split(/[,、]/).map(w => w.trim()).filter(w => w);
-                        weapons.forEach(w => {
-                            weaponsHtml += `<span class="weapon-tag">${w}</span>`;
-                        });
-                    } else {
-                        weaponsHtml = `<span class="weapon-tag text-gray-400">ブキ情報なし</span>`;
-                    }
-
-                    div.innerHTML = `
-                        <div class="member-name-row">
-                            <p class="member-name">
-                                <span class="material-symbols-rounded text-base text-gray-400">person</span>
-                                ${name}
-                            </p>
-                            ${kanaHtml}
-                        </div>
-                        <div class="weapon-container">
-                            ${weaponsHtml}
-                        </div>
-                    `;
-                    memContainer.appendChild(div);
+            if (!isSeed && !isWithdrawn && teamId) {
+                if (isWinner) {
+                    html += `<span class="material-symbols-rounded win-icon">emoji_events</span>`;
+                    html += `<div class="score-display text-gray-800">${score}</div>`;
+                } else {
+                    html += `<div class="score-display text-gray-400">${score}</div>`;
                 }
             }
 
-            document.getElementById('team-modal').classList.add('show');
-        };
+            row.innerHTML = html;
+            return row;
+        }
 
-        window.closeTeamModal = (e) => {
-            if(e) e.stopPropagation();
-            document.getElementById('team-modal').classList.remove('show');
-        };
+        function getRoundFormat(roundNum, totalRounds) {
+            const settings = tournamentSettings.matchFormat || { other: 'BO3', semis: 'BO5', finals: 'BO5' };
+            if (roundNum === totalRounds) return settings.finals;
+            if (roundNum === totalRounds - 1) return settings.semis;
+            return settings.other;
+        }
 
-        // --- Modal Logic (Circles) ---
-        window.openCircleModal = (circleName) => {
-            const info = CIRCLE_DATA.find(c => c['circle-name'] === circleName);
-            if (!info) return;
-
-            document.getElementById('modal-c-img').src = info['circle-social-img'] || '';
-            document.getElementById('modal-c-univ').textContent = info['circle-university'] || '';
-            document.getElementById('modal-c-name').textContent = info['circle-name'] || '';
+        function setupDragScroll() {
+            const slider = document.querySelector('.bracket-container');
+            let isDown = false;
+            let startX, scrollLeft;
             
-            const idEl = document.getElementById('modal-c-id');
-            if (info['circle-social-id']) {
-                idEl.textContent = `@${info['circle-social-id']}`;
-                idEl.href = `https://twitter.com/${info['circle-social-id']}`;
-                idEl.classList.remove('hidden');
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true; slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft; 
+                scrollLeft = slider.scrollLeft;
+            });
+            slider.addEventListener('mouseleave', () => { isDown = false; slider.classList.remove('active'); });
+            slider.addEventListener('mouseup', () => { isDown = false; slider.classList.remove('active'); });
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return; 
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft; 
+                const walk = (x - startX) * 1.5;
+                slider.scrollLeft = scrollLeft - walk;
+            });
+        }
+
+        // --- Team Modal Logic (Design Matched to team-viewer.html) ---
+        window.openTeamModal = (teamId) => {
+            const team = teamsMap.get(teamId);
+            if (!team || teamId === SEED_ID) return;
+            const isValid = (txt) => txt && txt !== "----" && txt !== "";
+
+            // Header (Color is always main grey as per team-viewer design concept)
+            mEl.bar.style.backgroundColor = 'var(--color-main)';
+            mEl.univ.textContent = team.university;
+            mEl.kana.textContent = isValid(team.teamName_kana) ? team.teamName_kana : "";
+            mEl.name.textContent = team.teamName;
+            
+            mEl.circle.textContent = team.circle;
+            mEl.circleContainer.onclick = () => openCircleModal(team.circle);
+
+            if (isValid(team.team_average_xp)) {
+                mEl.xpVal.textContent = Math.floor(Number(team.team_average_xp));
+                mEl.xpTag.classList.remove('hidden');
             } else {
-                idEl.classList.add('hidden');
+                mEl.xpTag.classList.add('hidden');
             }
 
-            document.getElementById('modal-c-win').textContent = info['circle-social-win'] ? `#${info['circle-social-win']}` : '';
-            document.getElementById('modal-c-comment').innerHTML = info['circle-comment'] || '';
+            // Members
+            mEl.members.innerHTML = '';
+            for (let i = 1; i <= 4; i++) {
+                const pName = team[`p${i}_name`];
+                if (!isValid(pName)) continue;
+                const pKana = team[`p${i}_name_kana`];
+                const pWeapon = team[`p${i}_weapon`];
+                
+                const div = document.createElement('div');
+                div.className = 'member-card';
+                div.innerHTML = `
+                    <div class="name-group">
+                        <span class="member-name">${pName}</span>
+                        ${isValid(pKana) ? `<span class="member-kana">${pKana}</span>` : ''}
+                        <span class="member-weapon">${pWeapon || '-'}</span>
+                    </div>
+                `;
+                mEl.members.appendChild(div);
+            }
 
-            document.getElementById('circle-modal').classList.add('show');
+            // Info Sections
+            let infoHtml = '';
+            const appendInfo = (label, text) => {
+                infoHtml += `<div class="info-block"><div class="info-label">${label}</div><p class="info-content">${text}</p></div>`;
+            };
+            
+            if (isValid(team.comment)) appendInfo("意気込み", team.comment);
+            if (isValid(team.records)) appendInfo("実績", team.records);
+            if (isValid(team.message)) appendInfo("メッセージ", team.message);
+            
+            mEl.infoContainer.innerHTML = infoHtml;
+            modalEl.classList.add('show');
         };
 
-        window.closeCircleModal = (e) => {
-            if(e) e.stopPropagation();
-            document.getElementById('circle-modal').classList.remove('show');
+        window.closeTeamModal = () => modalEl.classList.remove('show');
+        window.handleModalOutsideClick = (e) => { if (e.target === modalEl) closeTeamModal(); };
+
+
+        // --- Circle Modal Logic (Matched to team-viewer.html) ---
+        window.openCircleModal = (circleName) => {
+            const info = circleData.find(c => c['circleName'] === circleName) || circleData.find(c => c['circle_name'] === circleName);
+            if (!info) return;
+
+            cmEl.img.src = info['icon_url'] || '';
+            cmEl.univ.textContent = info['university'] || 'UNIVERSITY';
+            cmEl.name.textContent = info['circleName'] || circleName;
+            cmEl.comment.textContent = info['description'] || '情報がありません';
+
+            const twId = info['twitter'];
+            if (twId && twId !== '-') {
+                const cleanId = twId.replace(/^@/, '');
+                cmEl.id.textContent = `@${cleanId}`;
+                cmEl.id.href = `https://twitter.com/${cleanId}`;
+                cmEl.id.classList.remove('hidden');
+            } else {
+                cmEl.id.classList.add('hidden');
+            }
+
+            const tag = info['hashtag'];
+            if (tag && tag !== '-') {
+                const rawTag = tag.replace('#', '');
+                cmEl.win.textContent = `#${rawTag}`;
+                cmEl.win.href = `https://twitter.com/intent/tweet?hashtags=${rawTag}`;
+                cmEl.win.classList.remove('hidden');
+            } else {
+                cmEl.win.classList.add('hidden');
+            }
+
+            cModalEl.classList.add('show');
         };
+
+        window.closeCircleModal = () => cModalEl.classList.remove('show');
+        // サークルモーダルは外側クリックで閉じる実装も追加
+        window.addEventListener('click', (e) => {
+            if (e.target === cModalEl) closeCircleModal();
+        });
 
         init();
     </script>
 </body>
+
 </html>
